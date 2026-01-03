@@ -35,14 +35,6 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
         }
 
-        /* Gradient Text */
-        .text-gradient {
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(to right, #4f46e5, #ec4899);
-        }
-
         /* Tab Active State */
         .tab-btn { position: relative; transition: all 0.3s ease; }
         .tab-btn::after {
@@ -60,35 +52,54 @@
 
         /* Copy Button Animation */
         .copy-btn:active { transform: scale(0.95); }
+
+        /* Floating Button Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+        .floating-icon { animation: float 3s ease-in-out infinite; }
     </style>
 </head>
 <body class="text-slate-800 antialiased">
 
-    <!-- Header Section with Parallax Feel -->
+    <!-- Fixed Floating Language Button -->
+    <button onclick="toggleLanguage()" class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-indigo-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-indigo-700 hover:scale-110 transition-all duration-300 group floating-icon" title="Switch Language">
+        <i class="fas fa-language text-2xl group-hover:rotate-12 transition-transform"></i>
+        <span class="absolute right-16 bg-slate-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-xl border border-slate-700 pointer-events-none font-sans">
+            TH / EN
+        </span>
+    </button>
+
+    <!-- Header Section -->
     <header class="bg-[#0f172a] text-white relative overflow-hidden pb-12 pt-8 md:pt-16">
-        <!-- Abstract Background Shapes -->
         <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 animate-pulse"></div>
         <div class="absolute bottom-0 left-0 w-[300px] h-[300px] bg-pink-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4"></div>
 
         <div class="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6" data-aos="fade-down">
                 <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-indigo-300 text-xs font-bold uppercase tracking-wider mb-4 backdrop-blur-sm">
-                        <i class="fas fa-gem text-xs animate-pulse"></i> Premium Strategy
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-indigo-300 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                            <i class="fas fa-gem text-xs animate-pulse"></i> <span class="lang-text" data-th="Premium Strategy" data-en="Premium Strategy">Premium Strategy</span>
+                        </div>
                     </div>
                     <h1 class="text-4xl md:text-6xl font-bold mb-3 tracking-tight">
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">Digital Marketing</span> Plan
                     </h1>
-                    <p class="text-slate-400 max-w-xl text-lg font-light leading-relaxed">
+                    <p class="text-slate-400 max-w-xl text-lg font-light leading-relaxed lang-text" 
+                       data-th="แผนแม่บทการตลาดสำหรับ Silin Salon: ยกระดับแบรนด์ เจาะกลุ่มเป้าหมาย และเพิ่มยอดจองด้วยข้อมูลจริง"
+                       data-en="Strategic Marketing Masterplan for Silin Salon: Brand elevation, targeted outreach, and data-driven booking growth.">
                         แผนแม่บทการตลาดสำหรับ <span class="text-white font-medium">Silin Salon</span>: ยกระดับแบรนด์ เจาะกลุ่มเป้าหมาย และเพิ่มยอดจองด้วยข้อมูลจริง
                     </p>
                 </div>
                 <div class="text-left md:text-right w-full md:w-auto bg-slate-800/50 p-4 rounded-xl backdrop-blur-sm border border-slate-700/50">
-                    <div class="text-slate-400 text-xs uppercase tracking-wider mb-1">CLIENT</div>
+                    <div class="text-slate-400 text-xs uppercase tracking-wider mb-1 lang-text" data-th="ลูกค้า" data-en="CLIENT">ลูกค้า</div>
                     <div class="font-bold text-2xl text-white">Silin Salon</div>
                     <div class="text-indigo-400 text-sm mt-1 font-medium flex items-center md:justify-end gap-2">
                         <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        Q1 2026 Roadmap
+                        <span class="lang-text" data-th="ไตรมาส 1 ปี 2026 Roadmap" data-en="Q1 2026 Roadmap">Q1 2026 Roadmap</span>
                     </div>
                 </div>
             </div>
@@ -96,23 +107,23 @@
     </header>
 
     <!-- Sticky Navigation Tabs -->
-    <div class="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm transition-all duration-300">
+    <div class="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-200 shadow-sm transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 md:px-6 overflow-x-auto scrollbar-hide">
             <div class="flex space-x-2 md:space-x-8 min-w-max pb-1 pt-1">
                 <button onclick="switchTab('summary')" id="tab-summary" class="tab-btn active py-4 px-2 text-sm md:text-base text-slate-600 hover:text-indigo-600 flex items-center gap-2">
-                    <i class="fas fa-chart-pie"></i> บทสรุป
+                    <i class="fas fa-chart-pie"></i> <span class="lang-text" data-th="บทสรุป" data-en="Summary">บทสรุป</span>
                 </button>
                 <button onclick="switchTab('keywords')" id="tab-keywords" class="tab-btn py-4 px-2 text-sm md:text-base text-slate-600 hover:text-indigo-600 flex items-center gap-2">
-                    <i class="fas fa-search"></i> คีย์เวิร์ด
+                    <i class="fas fa-search"></i> <span class="lang-text" data-th="คีย์เวิร์ด" data-en="Keywords">คีย์เวิร์ด</span>
                 </button>
                 <button onclick="switchTab('competitors')" id="tab-competitors" class="tab-btn py-4 px-2 text-sm md:text-base text-slate-600 hover:text-indigo-600 flex items-center gap-2">
-                    <i class="fas fa-users"></i> คู่แข่ง
+                    <i class="fas fa-users"></i> <span class="lang-text" data-th="คู่แข่ง" data-en="Competitors">คู่แข่ง</span>
                 </button>
                 <button onclick="switchTab('ads')" id="tab-ads" class="tab-btn py-4 px-2 text-sm md:text-base text-slate-600 hover:text-indigo-600 flex items-center gap-2">
-                    <i class="fab fa-google"></i> โฆษณา Ads
+                    <i class="fab fa-google"></i> <span class="lang-text" data-th="โฆษณา Ads" data-en="Ads Strategy">โฆษณา Ads</span>
                 </button>
                 <button onclick="switchTab('action')" id="tab-action" class="tab-btn py-4 px-2 text-sm md:text-base text-slate-600 hover:text-indigo-600 flex items-center gap-2">
-                    <i class="fas fa-tasks"></i> แผนงาน
+                    <i class="fas fa-tasks"></i> <span class="lang-text" data-th="แผนงาน" data-en="Action Plan">แผนงาน</span>
                 </button>
             </div>
         </div>
@@ -123,65 +134,63 @@
 
         <!-- TAB 1: EXECUTIVE SUMMARY -->
         <div id="content-summary" class="block space-y-8">
-            <!-- Strategic Overview -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" data-aos="fade-up">
                 <div class="lg:col-span-2 bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-shadow">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-100 transition-colors"></div>
                     <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center relative z-10">
                         <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg mr-3"><i class="fas fa-lightbulb"></i></span>
-                        Executive Summary
+                        <span class="lang-text" data-th="Executive Summary" data-en="Executive Summary">Executive Summary</span>
                     </h3>
                     <div class="prose text-slate-600 text-base md:text-lg leading-relaxed relative z-10">
-                        <p class="mb-4">
+                        <p class="mb-4 lang-text" 
+                           data-th="Silin Salon มีโอกาสเติบโตสูงในตลาด 'Volume สูง แต่คู่แข่งน้อย' ในพื้นที่ราชพฤกษ์และกาญจนาภิเษก โดยมีคำค้นหาในกลุ่ม Local Search กว่า <span class='text-emerald-600 font-bold'>140,000+ ครั้ง/เดือน</span>"
+                           data-en="Silin Salon has high growth potential in a 'High Volume, Low Competition' market in Ratchaphruek and Kanchanaphisek areas, with over <span class='text-emerald-600 font-bold'>140,000+ monthly searches</span> in the Local Search category.">
                             Silin Salon มีโอกาสเติบโตสูงในตลาด <strong>"Volume สูง แต่คู่แข่งน้อย"</strong> ในพื้นที่ราชพฤกษ์และกาญจนาภิเษก โดยมีคำค้นหาในกลุ่ม Local Search กว่า <span class="text-emerald-600 font-bold">140,000+ ครั้ง/เดือน</span>
                         </p>
-                        <p>
+                        <p class="lang-text"
+                           data-th="อย่างไรก็ตาม บริการ High-Ticket (เคราติน, ทำสี) มีการแข่งขันสูง เราจึงต้องใช้กลยุทธ์ 'Segmentation' แบ่งกลุ่มเป้าหมายให้ชัดเจน พร้อมแผนฟื้นฟูแบรนด์ Arin Salon เพื่อดักลูกค้าฝั่งมหาชัย"
+                           data-en="However, High-Ticket services (Keratin, Coloring) are highly competitive. We must use a 'Segmentation' strategy to clearly define target groups, along with a rebranding plan for Arin Salon to capture customers in the Mahachai area.">
                             อย่างไรก็ตาม บริการ High-Ticket (เคราติน, ทำสี) มีการแข่งขันสูง เราจึงต้องใช้กลยุทธ์ <strong>"Segmentation"</strong> แบ่งกลุ่มเป้าหมายให้ชัดเจน พร้อมแผนฟื้นฟูแบรนด์ Arin Salon เพื่อดักลูกค้าฝั่งมหาชัย
                         </p>
                     </div>
                 </div>
 
-                <!-- Interactive Chart Card -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-center items-center relative" data-aos="fade-up" data-aos-delay="100">
-                    <h4 class="text-sm font-bold text-slate-500 uppercase mb-4 self-start">สัดส่วนความต้องการลูกค้า (Search Intent)</h4>
+                    <h4 class="text-sm font-bold text-slate-500 uppercase mb-4 self-start lang-text" data-th="สัดส่วนความต้องการลูกค้า (Search Intent)" data-en="Search Intent Distribution">สัดส่วนความต้องการลูกค้า (Search Intent)</h4>
                     <div class="w-48 h-48 relative">
                         <canvas id="intentChart"></canvas>
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <span class="text-2xl font-bold text-slate-800">4 กลุ่ม</span>
+                            <span class="text-2xl font-bold text-slate-800 lang-text" data-th="4 กลุ่ม" data-en="4 Groups">4 กลุ่ม</span>
                         </div>
                     </div>
-                    <div class="mt-4 text-xs text-slate-400 text-center">
+                    <div class="mt-4 text-xs text-slate-400 text-center lang-text" data-th="*วิเคราะห์จากข้อมูลคำค้นหาจริง" data-en="*Based on actual search query data">
                         *วิเคราะห์จากข้อมูลคำค้นหาจริง
                     </div>
                 </div>
             </div>
 
-            <!-- Online Presence Status -->
             <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100" data-aos="fade-up" data-aos-delay="200">
                 <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center">
                     <span class="bg-emerald-100 text-emerald-600 p-2 rounded-lg mr-3"><i class="fas fa-check-circle"></i></span>
-                    สถานะแบรนด์ปัจจุบัน (Brand Health)
+                    <span class="lang-text" data-th="สถานะแบรนด์ปัจจุบัน (Brand Health)" data-en="Current Brand Health">สถานะแบรนด์ปัจจุบัน (Brand Health)</span>
                 </h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="branch-list">
-                    <!-- Dynamic Branch Cards will be injected here -->
-                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="branch-list"></div>
             </div>
         </div>
 
-        <!-- TAB 2: KEYWORDS (With Filter) -->
+        <!-- TAB 2: KEYWORDS -->
         <div id="content-keywords" class="hidden space-y-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100" data-aos="fade-down">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800">Keyword Intelligence</h2>
-                    <p class="text-sm text-slate-500">ข้อมูลเชิงลึกจาก Ubersuggest เพื่อการตัดสินใจ</p>
+                    <p class="text-sm text-slate-500 lang-text" data-th="ข้อมูลเชิงลึกจาก Ubersuggest เพื่อการตัดสินใจ" data-en="Insights from Ubersuggest for decision making">ข้อมูลเชิงลึกจาก Ubersuggest เพื่อการตัดสินใจ</p>
                 </div>
-                <!-- Filters -->
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="filterKeywords('all')" class="filter-btn active px-4 py-2 rounded-full text-xs font-semibold bg-indigo-600 text-white shadow-md transition-all hover:scale-105">ทั้งหมด</button>
-                    <button onclick="filterKeywords('High Vol')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">คำค้นหาสูง</button>
-                    <button onclick="filterKeywords('Service')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">บริการ (Service)</button>
-                    <button onclick="filterKeywords('Location')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">พื้นที่ (Local)</button>
-                    <button onclick="filterKeywords('Long-tail')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all">คำถาม (Q&A)</button>
+                    <button onclick="filterKeywords('all')" class="filter-btn active px-4 py-2 rounded-full text-xs font-semibold bg-indigo-600 text-white shadow-md transition-all hover:scale-105 lang-text" data-th="ทั้งหมด" data-en="All">ทั้งหมด</button>
+                    <button onclick="filterKeywords('High Vol')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all lang-text" data-th="คำค้นหาสูง" data-en="High Vol">คำค้นหาสูง</button>
+                    <button onclick="filterKeywords('Service')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all lang-text" data-th="บริการ (Service)" data-en="Service">บริการ (Service)</button>
+                    <button onclick="filterKeywords('Location')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all lang-text" data-th="พื้นที่ (Local)" data-en="Location">พื้นที่ (Local)</button>
+                    <button onclick="filterKeywords('Long-tail')" class="filter-btn px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all lang-text" data-th="คำถาม (Q&A)" data-en="Questions">คำถาม (Q&A)</button>
                 </div>
             </div>
 
@@ -190,16 +199,14 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-semibold border-b border-slate-200">
-                                <th class="py-4 pl-6">คำค้นหา</th>
+                                <th class="py-4 pl-6 lang-text" data-th="คำค้นหา" data-en="Keyword">คำค้นหา</th>
                                 <th class="py-4 text-right">Volume</th>
                                 <th class="py-4 text-right">CPC</th>
                                 <th class="py-4 px-4 text-center">Difficulty</th>
                                 <th class="py-4 pr-6 text-right">Intent</th>
                             </tr>
                         </thead>
-                        <tbody id="keyword-table-body" class="divide-y divide-slate-100 text-sm">
-                            <!-- JS populated -->
-                        </tbody>
+                        <tbody id="keyword-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
                     </table>
                 </div>
             </div>
@@ -207,9 +214,7 @@
 
         <!-- TAB 3: COMPETITORS -->
         <div id="content-competitors" class="hidden space-y-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="competitor-grid">
-                <!-- JS populated -->
-            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="competitor-grid"></div>
             
             <div class="bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 rounded-2xl p-6 md:p-8" data-aos="fade-up">
                 <h3 class="font-bold text-indigo-900 mb-4 flex items-center text-lg">
@@ -218,67 +223,54 @@
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
                     <div class="bg-white p-4 rounded-xl shadow-sm">
-                        <div class="font-bold text-slate-800 mb-2">📸 จุดเช็คอิน</div>
-                        <p class="text-slate-600">ลูกค้าย่านราชพฤกษ์ให้ความสำคัญกับ <strong>"บรรยากาศร้าน"</strong> มากที่สุด เพื่อถ่ายรูปลง Social (Reference: Cozy Salon)</p>
+                        <div class="font-bold text-slate-800 mb-2 lang-text" data-th="📸 จุดเช็คอิน" data-en="📸 Check-in Spots">📸 จุดเช็คอิน</div>
+                        <p class="text-slate-600 lang-text" data-th="ลูกค้าย่านราชพฤกษ์ให้ความสำคัญกับ 'บรรยากาศร้าน' มากที่สุด เพื่อถ่ายรูปลง Social (Reference: Cozy Salon)" data-en="Customers in Ratchaphruek prioritize 'Shop Atmosphere' for Social Media photos (Ref: Cozy Salon).">ลูกค้าย่านราชพฤกษ์ให้ความสำคัญกับ <strong>"บรรยากาศร้าน"</strong> มากที่สุด เพื่อถ่ายรูปลง Social (Reference: Cozy Salon)</p>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow-sm">
-                        <div class="font-bold text-slate-800 mb-2">💬 บทสนทนา</div>
-                        <p class="text-slate-600">ย่านมหาชัยมีการพูดถึง <strong>"ความเป็นกันเอง"</strong> และ <strong>"ราคาที่จริงใจ"</strong> ใน Lemon8 บ่อยครั้ง</p>
+                        <div class="font-bold text-slate-800 mb-2 lang-text" data-th="💬 บทสนทนา" data-en="💬 Conversations">💬 บทสนทนา</div>
+                        <p class="text-slate-600 lang-text" data-th="ย่านมหาชัยมีการพูดถึง 'ความเป็นกันเอง' และ 'ราคาที่จริงใจ' ใน Lemon8 บ่อยครั้ง" data-en="Mahachai area is frequently mentioned for 'Friendliness' and 'Sincere Pricing' on Lemon8.">ย่านมหาชัยมีการพูดถึง <strong>"ความเป็นกันเอง"</strong> และ <strong>"ราคาที่จริงใจ"</strong> ใน Lemon8 บ่อยครั้ง</p>
                     </div>
                     <div class="bg-white p-4 rounded-xl shadow-sm">
-                        <div class="font-bold text-slate-800 mb-2">🌱 เทรนด์มาแรง</div>
-                        <p class="text-slate-600">กระแส <strong>"Organic Hair Color"</strong> กำลังถูกค้นหาเพิ่มขึ้นในกลุ่มคนทำงานย่านชานเมือง</p>
+                        <div class="font-bold text-slate-800 mb-2 lang-text" data-th="🌱 เทรนด์มาแรง" data-en="🌱 Trending">🌱 เทรนด์มาแรง</div>
+                        <p class="text-slate-600 lang-text" data-th="กระแส 'Organic Hair Color' กำลังถูกค้นหาเพิ่มขึ้นในกลุ่มคนทำงานย่านชานเมือง" data-en="'Organic Hair Color' trend is rising among suburban working professionals.">กระแส <strong>"Organic Hair Color"</strong> กำลังถูกค้นหาเพิ่มขึ้นในกลุ่มคนทำงานย่านชานเมือง</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TAB 4: ADS (Interactive) -->
+        <!-- TAB 4: ADS -->
         <div id="content-ads" class="hidden space-y-8">
-            <div class="grid grid-cols-1 gap-8" id="ads-grid">
-                <!-- JS populated -->
-            </div>
+            <div class="grid grid-cols-1 gap-8" id="ads-grid"></div>
 
-            <!-- Negative Keywords -->
             <div class="bg-rose-50/50 border border-rose-100 rounded-2xl p-6 md:p-8" data-aos="fade-up">
                 <h3 class="font-bold text-rose-800 mb-4 flex items-center">
                    <span class="bg-rose-100 p-2 rounded-lg mr-3"><i class="fas fa-shield-alt"></i></span> 
-                   Negative Keywords (คำต้องห้าม)
+                   <span class="lang-text" data-th="Negative Keywords (คำต้องห้าม)" data-en="Negative Keywords">Negative Keywords (คำต้องห้าม)</span>
                 </h3>
-                <p class="text-rose-600 text-sm mb-6">ใส่คำเหล่านี้เพื่อป้องกันงบรั่วไหลไปกับคนที่ไม่ใช่ลูกค้าจริง</p>
+                <p class="text-rose-600 text-sm mb-6 lang-text" data-th="ใส่คำเหล่านี้เพื่อป้องกันงบรั่วไหลไปกับคนที่ไม่ใช่ลูกค้าจริง" data-en="Add these words to prevent budget waste on non-customers.">ใส่คำเหล่านี้เพื่อป้องกันงบรั่วไหลไปกับคนที่ไม่ใช่ลูกค้าจริง</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2">หมวดเรียน/สอน</div>
-                        <div class="flex flex-wrap gap-1">
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">สอน</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">เรียน</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">หลักสูตร</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">วิธีทำ</span>
+                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2 lang-text" data-th="หมวดเรียน/สอน" data-en="Education/Training">หมวดเรียน/สอน</div>
+                        <div class="flex flex-wrap gap-1 text-xs text-rose-600 lang-text" data-th="<span class='bg-rose-50 px-2 py-1 rounded'>สอน</span> <span class='bg-rose-50 px-2 py-1 rounded'>เรียน</span>" data-en="<span class='bg-rose-50 px-2 py-1 rounded'>Teach</span> <span class='bg-rose-50 px-2 py-1 rounded'>Learn</span>">
+                            <span class="bg-rose-50 px-2 py-1 rounded">สอน</span> <span class="bg-rose-50 px-2 py-1 rounded">เรียน</span>
                         </div>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2">หมวดทำเอง</div>
-                        <div class="flex flex-wrap gap-1">
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">ซื้อที่ไหน</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">ราคาส่ง</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">น้ำยา</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">Shopee</span>
+                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2 lang-text" data-th="หมวดทำเอง" data-en="DIY/Wholesale">หมวดทำเอง</div>
+                        <div class="flex flex-wrap gap-1 text-xs text-rose-600 lang-text" data-th="<span class='bg-rose-50 px-2 py-1 rounded'>ซื้อที่ไหน</span> <span class='bg-rose-50 px-2 py-1 rounded'>ราคาส่ง</span>" data-en="<span class='bg-rose-50 px-2 py-1 rounded'>Where to buy</span> <span class='bg-rose-50 px-2 py-1 rounded'>Wholesale</span>">
+                            <span class="bg-rose-50 px-2 py-1 rounded">ซื้อที่ไหน</span> <span class="bg-rose-50 px-2 py-1 rounded">ราคาส่ง</span>
                         </div>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2">หมวดหางาน</div>
-                        <div class="flex flex-wrap gap-1">
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">สมัครงาน</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">รับช่าง</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">พาร์ทไทม์</span>
+                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2 lang-text" data-th="หมวดหางาน" data-en="Job Search">หมวดหางาน</div>
+                        <div class="flex flex-wrap gap-1 text-xs text-rose-600 lang-text" data-th="<span class='bg-rose-50 px-2 py-1 rounded'>สมัครงาน</span> <span class='bg-rose-50 px-2 py-1 rounded'>รับช่าง</span>" data-en="<span class='bg-rose-50 px-2 py-1 rounded'>Apply job</span> <span class='bg-rose-50 px-2 py-1 rounded'>Hiring</span>">
+                            <span class="bg-rose-50 px-2 py-1 rounded">สมัครงาน</span> <span class="bg-rose-50 px-2 py-1 rounded">รับช่าง</span>
                         </div>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-rose-100 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2">หมวดของถูก</div>
-                        <div class="flex flex-wrap gap-1">
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">ฟรี</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">มือสอง</span>
-                            <span class="text-xs bg-rose-50 text-rose-600 px-2 py-1 rounded">99 บาท</span>
+                        <div class="font-bold text-rose-700 text-sm mb-2 border-b border-rose-50 pb-2 lang-text" data-th="หมวดของถูก" data-en="Cheap/Free">หมวดของถูก</div>
+                        <div class="flex flex-wrap gap-1 text-xs text-rose-600 lang-text" data-th="<span class='bg-rose-50 px-2 py-1 rounded'>ฟรี</span> <span class='bg-rose-50 px-2 py-1 rounded'>มือสอง</span>" data-en="<span class='bg-rose-50 px-2 py-1 rounded'>Free</span> <span class='bg-rose-50 px-2 py-1 rounded'>Second hand</span>">
+                            <span class="bg-rose-50 px-2 py-1 rounded">ฟรี</span> <span class="bg-rose-50 px-2 py-1 rounded">มือสอง</span>
                         </div>
                     </div>
                 </div>
@@ -287,17 +279,15 @@
 
         <!-- TAB 5: ACTION PLAN -->
         <div id="content-action" class="hidden space-y-8">
-            <div class="space-y-6" id="action-timeline">
-                <!-- JS populated -->
-            </div>
+            <div class="space-y-6" id="action-timeline"></div>
             
             <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex items-start" data-aos="fade-up">
                 <div class="bg-amber-100 p-2 rounded-full mr-4 flex-shrink-0 text-amber-600">
                     <i class="fas fa-exclamation-triangle"></i>
                 </div>
                 <div>
-                   <h4 class="font-bold text-amber-800 text-base">Checklist สำคัญก่อนยิงโฆษณา</h4>
-                   <p class="text-amber-700 text-sm mt-1 leading-relaxed">
+                   <h4 class="font-bold text-amber-800 text-base lang-text" data-th="Checklist สำคัญก่อนยิงโฆษณา" data-en="Critical Pre-Launch Checklist">Checklist สำคัญก่อนยิงโฆษณา</h4>
+                   <p class="text-amber-700 text-sm mt-1 leading-relaxed lang-text" data-th="เว็บไซต์หรือหน้า Landing Page ต้องมีปุ่ม 'โทรออก', 'แอดไลน์', หรือ 'จองคิว' ที่กดได้จริงและเห็นชัดเจนในหน้าแรก (Above the fold) เพื่อไม่ให้เสียเงินค่าคลิกฟรี" data-en="Website or Landing Page must have 'Call', 'Add Line', or 'Book Now' buttons that are clickable and clearly visible above the fold to avoid wasting ad spend.">
                       เว็บไซต์หรือหน้า Landing Page ต้องมีปุ่ม <strong>"โทรออก"</strong>, <strong>"แอดไลน์"</strong>, หรือ <strong>"จองคิว"</strong> ที่กดได้จริงและเห็นชัดเจนในหน้าแรก (Above the fold) เพื่อไม่ให้เสียเงินค่าคลิกฟรี
                    </p>
                 </div>
@@ -310,17 +300,27 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
         // --- INITIALIZATION ---
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 50
-        });
+        AOS.init({ duration: 800, once: true, offset: 50 });
 
-        // --- DATA ---
+        let currentLang = 'th';
+
+        // --- DATA WITH TRANSLATIONS ---
         const branches = [
-            { name: "Silin Salon สาขาราชพฤกษ์", rating: 4.9, reviews: 156, status: "Active", loc: "ราชพฤกษ์" },
-            { name: "Silin Salon สาขากาญจนาภิเษก", rating: 4.8, reviews: 124, status: "Active", loc: "กาญจนาภิเษก" },
-            { name: "Arin Salon สาขามหาชัย", rating: 4.5, reviews: 82, status: "Rebranding", loc: "สมุทรสาคร" }
+            { 
+                name_th: "Silin Salon สาขาราชพฤกษ์", name_en: "Silin Salon Ratchaphruek",
+                rating: 4.9, reviews: 156, status: "Active", 
+                loc_th: "ราชพฤกษ์", loc_en: "Ratchaphruek" 
+            },
+            { 
+                name_th: "Silin Salon สาขากาญจนาภิเษก", name_en: "Silin Salon Kanchanaphisek",
+                rating: 4.8, reviews: 124, status: "Active", 
+                loc_th: "กาญจนาภิเษก", loc_en: "Kanchanaphisek" 
+            },
+            { 
+                name_th: "Arin Salon สาขามหาชัย", name_en: "Arin Salon Mahachai",
+                rating: 4.5, reviews: 82, status: "Rebranding", 
+                loc_th: "สมุทรสาคร", loc_en: "Samut Sakhon" 
+            }
         ];
 
         const keywords = [
@@ -338,304 +338,252 @@
         ];
 
         const competitors = [
-            { name: "Elite Hair", area: "ราชพฤกษ์", price: "฿฿", strength: "บริการดี ราคาเข้าถึงง่าย", weakness: "คิวแน่น", score: 85 },
-            { name: "Cozy Salon", area: "ราชพฤกษ์", price: "฿฿฿", strength: "บรรยากาศเกาหลี มินิมอล", weakness: "ราคาสูง", score: 90 },
-            { name: "Fin Hair Shop", area: "กาญจนาฯ", price: "฿฿", strength: "ตั้งอยู่ในห้าง สะดวก", weakness: "รอนาน", score: 75 },
-            { name: "ร้านเตือน บิวตี้", area: "มหาชัย", price: "฿", strength: "ราคาถูกมาก", weakness: "สไตล์ดั้งเดิม", score: 70 }
+            { 
+                name: "Elite Hair", area_th: "ราชพฤกษ์", area_en: "Ratchaphruek", price: "฿฿", 
+                strength_th: "บริการดี ราคาเข้าถึงง่าย", strength_en: "Good service, accessible price",
+                weakness_th: "คิวแน่น", weakness_en: "Fully booked quickly",
+                score: 85 
+            },
+            { 
+                name: "Cozy Salon", area_th: "ราชพฤกษ์", area_en: "Ratchaphruek", price: "฿฿฿", 
+                strength_th: "บรรยากาศเกาหลี มินิมอล", strength_en: "Korean Minimalist Atmosphere",
+                weakness_th: "ราคาสูง", weakness_en: "High Price",
+                score: 90 
+            },
+            { 
+                name: "Fin Hair Shop", area_th: "กาญจนาฯ", area_en: "Kanchanaphisek", price: "฿฿", 
+                strength_th: "ตั้งอยู่ในห้าง สะดวก", strength_en: "In Mall, Convenient",
+                weakness_th: "รอนาน", weakness_en: "Long wait times",
+                score: 75 
+            },
+            { 
+                name: "ร้านเตือน บิวตี้", area_th: "มหาชัย", area_en: "Mahachai", price: "฿", 
+                strength_th: "ราคาถูกมาก", strength_en: "Very cheap",
+                weakness_th: "สไตล์ดั้งเดิม", weakness_en: "Traditional style",
+                score: 70 
+            }
         ];
 
         const ads = [
             {
-                name: "1. สายทำสี (Color Expert)", goal: "เน้นตรงปก ผมไม่เสีย", cpc: "฿10.00",
-                headline: "ทำสีผม ไฮไลท์ ตรงปก | ผมนุ่มสวย ไม่แห้งเสีย | Silin Salon กูรูเรื่องสีผม",
-                desc: "อยากได้สีไหนเราจัดให้เป๊ะ เทคนิคพิเศษถนอมแกนผม ทำแล้วผมนุ่มกว่าเดิม จองเลย. จบปัญหาทำสีแล้วผมพัง การันตีผลลัพธ์สวยตรงปก",
-                tags: ["สีผมแฟชั่น", "ไฮไลท์"]
+                name_th: "1. สายทำสี (Color Expert)", name_en: "1. Color Expert",
+                goal_th: "เน้นตรงปก ผมไม่เสีย", goal_en: "Exact match, Healthy hair",
+                cpc: "฿10.00",
+                headline_th: "ทำสีผม ไฮไลท์ ตรงปก | ผมนุ่มสวย ไม่แห้งเสีย | Silin Salon กูรูเรื่องสีผม",
+                headline_en: "Hair Color/Highlights Exact Match | Soft Healthy Hair | Silin Salon Color Guru",
+                desc_th: "อยากได้สีไหนเราจัดให้เป๊ะ เทคนิคพิเศษถนอมแกนผม ทำแล้วผมนุ่มกว่าเดิม จองเลย",
+                desc_en: "Get the exact color you want. Special technique preserves hair core. Softer than before. Book now.",
+                tags_th: ["สีผมแฟชั่น", "ไฮไลท์"], tags_en: ["Fashion Color", "Highlights"]
             },
             {
-                name: "2. สายกู้ผมเสีย (Keratin)", goal: "เน้นว้าว เงากระจก", cpc: "฿12.50",
-                headline: "ยืดเคราติน ผมเงากระจก | กู้ผมพัง ให้เหมือนเกิดใหม่ | Silin Salon จบทุกปัญหาผม",
-                desc: "เปลี่ยนผมชี้ฟูเป็นผมสวยเรียบตรง นุ่มลื่น เงางามทันทีหลังทำ อยู่ได้นาน. นวัตกรรมเคราตินพรีเมียม ฟื้นฟูลึกถึงแกนผม",
-                tags: ["ผมเสีย", "เคราติน"]
+                name_th: "2. สายกู้ผมเสีย (Keratin)", name_en: "2. Keratin Rescue",
+                goal_th: "เน้นว้าว เงากระจก", goal_en: "Wow factor, Glass hair",
+                cpc: "฿12.50",
+                headline_th: "ยืดเคราติน ผมเงากระจก | กู้ผมพัง ให้เหมือนเกิดใหม่ | Silin Salon จบทุกปัญหาผม",
+                headline_en: "Keratin Glass Hair | Rescue Damaged Hair | Silin Salon Solves All",
+                desc_th: "เปลี่ยนผมชี้ฟูเป็นผมสวยเรียบตรง นุ่มลื่น เงางามทันทีหลังทำ อยู่ได้นาน",
+                desc_en: "Transform frizzy hair to straight, soft, shiny hair instantly. Long lasting.",
+                tags_th: ["ผมเสีย", "เคราติน"], tags_en: ["Damaged Hair", "Keratin"]
             },
             {
-                name: "3. ร้านใกล้ฉัน (Local)", goal: "เน้นไว้ใจได้", cpc: "฿6.50",
-                headline: "ร้านทำผมใกล้ฉัน Silin Salon | ลูกค้ากลับมาซ้ำ 98% | การันตีความสวยระดับพรีเมียม",
-                desc: "มองหาร้านทำผมคุณภาพ? มั่นใจด้วยรีวิวจริงกว่าร้อยเสียง บริการครบวงจรโดยช่างมือโปร. บรรยากาศส่วนตัว บริการเป็นกันเอง",
-                tags: ["ราชพฤกษ์", "กาญจนาฯ"]
+                name_th: "3. ร้านใกล้ฉัน (Local)", name_en: "3. Local Confidence",
+                goal_th: "เน้นไว้ใจได้", goal_en: "Trustworthy",
+                cpc: "฿6.50",
+                headline_th: "ร้านทำผมใกล้ฉัน Silin Salon | ลูกค้ากลับมาซ้ำ 98% | การันตีความสวยระดับพรีเมียม",
+                headline_en: "Silin Salon Near You | 98% Return Rate | Premium Quality Guaranteed",
+                desc_th: "มองหาร้านทำผมคุณภาพ? มั่นใจด้วยรีวิวจริงกว่าร้อยเสียง บริการครบวงจรโดยช่างมือโปร",
+                desc_en: "Looking for quality salon? Confident with 100+ real reviews. Full service by pros.",
+                tags_th: ["ราชพฤกษ์", "กาญจนาฯ"], tags_en: ["Ratchaphruek", "Kanchanaphisek"]
             },
             {
-                name: "4. ดักคู่แข่ง (Competitor)", goal: "ทางเลือกที่ดีกว่า", cpc: "฿8.00",
-                headline: "มองหาร้านทำผมคุณภาพ? | ลอง Silin Salon ไหม | บริการดี ระดับพรีเมียม",
-                desc: "อีกหนึ่งทางเลือกที่คุณต้องประทับใจ ช่างใส่ใจทุกรายละเอียด ราคาคุ้มค่า ดูรีวิวเลย. ไม่ต้องรอนาน ดูแลทั่วถึง",
-                tags: ["Chalachol", "Phoenix"]
+                name_th: "4. ดักคู่แข่ง (Competitor)", name_en: "4. Competitor",
+                goal_th: "ทางเลือกที่ดีกว่า", goal_en: "Better Alternative",
+                cpc: "฿8.00",
+                headline_th: "มองหาร้านทำผมคุณภาพ? | ลอง Silin Salon ไหม | บริการดี ระดับพรีเมียม",
+                headline_en: "Looking for quality salon? | Try Silin Salon | Premium Service",
+                desc_th: "อีกหนึ่งทางเลือกที่คุณต้องประทับใจ ช่างใส่ใจทุกรายละเอียด ราคาคุ้มค่า ดูรีวิวเลย",
+                desc_en: "Another alternative you will love. Attention to detail. Worth the price. See reviews.",
+                tags_th: ["Chalachol", "Phoenix"], tags_en: ["Chalachol", "Phoenix"]
             }
         ];
 
         const actionPlan = [
-            { week: "Week 1", title: "Setup & Foundation", tasks: ["สมัคร Google Ads", "ติด Tag Manager", "ยืนยัน Google Maps"], icon: "fa-tools", color: "bg-slate-500" },
-            { week: "Week 2", title: "Launch Campaign", tasks: ["ยิงแคมเปญ A, B, C", "ใส่ Negative Keywords", "ตั้งค่า Ad Extensions"], icon: "fa-rocket", color: "bg-indigo-500" },
-            { week: "Week 3-4", title: "Optimize & Scale", tasks: ["ดู Search Terms Report", "ปรับ Bid CPC", "A/B Test ข้อความ"], icon: "fa-chart-line", color: "bg-emerald-500" }
+            { week: "Week 1", title_th: "Setup & Foundation", title_en: "Setup & Foundation", tasks_th: ["สมัคร Google Ads", "ติด Tag Manager", "ยืนยัน Google Maps"], tasks_en: ["Register Google Ads", "Install Tag Manager", "Verify Google Maps"], icon: "fa-tools", color: "bg-slate-500" },
+            { week: "Week 2", title_th: "Launch Campaign", title_en: "Launch Campaign", tasks_th: ["ยิงแคมเปญ A, B, C", "ใส่ Negative Keywords", "ตั้งค่า Ad Extensions"], tasks_en: ["Launch Campaigns A, B, C", "Add Negative Keywords", "Setup Ad Extensions"], icon: "fa-rocket", color: "bg-indigo-500" },
+            { week: "Week 3-4", title_th: "Optimize & Scale", title_en: "Optimize & Scale", tasks_th: ["ดู Search Terms Report", "ปรับ Bid CPC", "A/B Test ข้อความ"], tasks_en: ["Check Search Terms", "Adjust CPC Bids", "A/B Test Copy"], icon: "fa-chart-line", color: "bg-emerald-500" }
         ];
 
-        // --- RENDER LOGIC ---
+        // --- RENDER FUNCTIONS ---
 
-        // 1. Render Branches
-        const branchContainer = document.getElementById('branch-list');
-        branches.forEach(b => {
-            const statusColor = b.status === 'Active' ? 'text-emerald-500 bg-emerald-50' : 'text-amber-500 bg-amber-50';
-            branchContainer.innerHTML += `
-                <div class="glass-card p-5 rounded-xl border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
-                    <div class="flex justify-between items-start mb-3">
-                        <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center">
-                            <i class="fas fa-store"></i>
+        function renderBranches() {
+            const container = document.getElementById('branch-list');
+            container.innerHTML = '';
+            branches.forEach(b => {
+                const statusColor = b.status === 'Active' ? 'text-emerald-500 bg-emerald-50' : 'text-amber-500 bg-amber-50';
+                const name = currentLang === 'th' ? b.name_th : b.name_en;
+                const loc = currentLang === 'th' ? b.loc_th : b.loc_en;
+                container.innerHTML += `
+                    <div class="glass-card p-5 rounded-xl border border-slate-100 hover:-translate-y-1 transition-transform duration-300">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="bg-indigo-50 text-indigo-600 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-store"></i></div>
+                            <span class="text-[10px] font-bold px-2 py-1 rounded-full ${statusColor}">${b.status}</span>
                         </div>
-                        <span class="text-[10px] font-bold px-2 py-1 rounded-full ${statusColor}">${b.status}</span>
-                    </div>
-                    <h4 class="font-bold text-slate-800 text-lg mb-1">${b.name}</h4>
-                    <div class="text-slate-500 text-sm mb-3"><i class="fas fa-map-pin mr-1"></i> ${b.loc}</div>
-                    <div class="flex items-center text-sm font-medium text-slate-700">
-                        <i class="fas fa-star text-amber-400 mr-1"></i> ${b.rating} 
-                        <span class="text-slate-400 mx-1">•</span> 
-                        <span class="text-slate-500 text-xs">${b.reviews} รีวิว</span>
-                    </div>
-                </div>
-            `;
-        });
-
-        // 2. Render Keywords (Initial)
-        renderKeywords(keywords);
+                        <h4 class="font-bold text-slate-800 text-lg mb-1">${name}</h4>
+                        <div class="text-slate-500 text-sm mb-3"><i class="fas fa-map-pin mr-1"></i> ${loc}</div>
+                        <div class="flex items-center text-sm font-medium text-slate-700">
+                            <i class="fas fa-star text-amber-400 mr-1"></i> ${b.rating} <span class="text-slate-400 mx-1">•</span> <span class="text-slate-500 text-xs">${b.reviews} รีวิว</span>
+                        </div>
+                    </div>`;
+            });
+        }
 
         function renderKeywords(data) {
             const container = document.getElementById('keyword-table-body');
             container.innerHTML = '';
-            data.forEach((kw, index) => {
-                // Difficulty Bar Logic
+            data.forEach(kw => {
                 let diffColor = kw.diff > 60 ? 'bg-rose-500' : kw.diff > 30 ? 'bg-amber-400' : 'bg-emerald-400';
-                
                 container.innerHTML += `
                     <tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-50 last:border-0 group">
-                        <td class="py-4 pl-6">
-                            <div class="font-medium text-slate-800 group-hover:text-indigo-600 transition-colors">${kw.term}</div>
-                            <div class="text-xs text-slate-400 mt-0.5 inline-block border border-slate-200 rounded px-1">${kw.type}</div>
-                        </td>
+                        <td class="py-4 pl-6"><div class="font-medium text-slate-800 group-hover:text-indigo-600 transition-colors">${kw.term}</div><div class="text-xs text-slate-400 mt-0.5 inline-block border border-slate-200 rounded px-1">${kw.type}</div></td>
                         <td class="py-4 text-right text-slate-600 font-mono">${kw.vol.toLocaleString()}</td>
                         <td class="py-4 text-right text-slate-600 font-mono">฿${kw.cpc.toFixed(2)}</td>
-                        <td class="py-4 px-4">
-                            <div class="flex flex-col items-center">
-                                <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1">
-                                    <div class="h-full ${diffColor}" style="width: ${kw.diff}%"></div>
-                                </div>
-                                <span class="text-[10px] text-slate-400 font-medium">${kw.diff}/100</span>
-                            </div>
-                        </td>
-                        <td class="py-4 pr-6 text-right">
-                            <span class="text-xs font-medium px-2 py-1 rounded-md ${kw.intent === 'Purchase' || kw.intent === 'Urgent' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-500'}">
-                                ${kw.intent}
-                            </span>
-                        </td>
-                    </tr>
-                `;
+                        <td class="py-4 px-4"><div class="flex flex-col items-center"><div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1"><div class="h-full ${diffColor}" style="width: ${kw.diff}%"></div></div><span class="text-[10px] text-slate-400 font-medium">${kw.diff}/100</span></div></td>
+                        <td class="py-4 pr-6 text-right"><span class="text-xs font-medium px-2 py-1 rounded-md ${kw.intent === 'Purchase' || kw.intent === 'Urgent' ? 'bg-indigo-50 text-indigo-600' : 'bg-slate-100 text-slate-500'}">${kw.intent}</span></td>
+                    </tr>`;
             });
         }
 
-        // Filter Function
-        function filterKeywords(type) {
-            // Button Styling
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                if(btn.textContent.includes(type === 'all' ? 'ทั้งหมด' : type)) {
-                    btn.classList.add('bg-indigo-600', 'text-white');
-                    btn.classList.remove('bg-slate-100', 'text-slate-600');
-                } else {
-                    btn.classList.remove('bg-indigo-600', 'text-white');
-                    btn.classList.add('bg-slate-100', 'text-slate-600');
-                }
+        function renderCompetitors() {
+            const container = document.getElementById('competitor-grid');
+            container.innerHTML = '';
+            competitors.forEach((comp, index) => {
+                const area = currentLang === 'th' ? comp.area_th : comp.area_en;
+                const strength = currentLang === 'th' ? comp.strength_th : comp.strength_en;
+                const weakness = currentLang === 'th' ? comp.weakness_th : comp.weakness_en;
+                
+                container.innerHTML += `
+                    <div class="glass-card rounded-xl p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-300" data-aos="fade-up" data-aos-delay="${index * 100}">
+                        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><i class="fas fa-cut text-6xl text-slate-800"></i></div>
+                        <div class="flex justify-between items-start mb-4 relative z-10"><div><h3 class="font-bold text-lg text-slate-800 group-hover:text-indigo-600 transition-colors">${comp.name}</h3><span class="inline-flex items-center text-xs text-slate-500 mt-1"><i class="fas fa-map-marker-alt mr-1"></i> ${area}</span></div><div class="text-sm font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">${comp.price}</div></div>
+                        <div class="space-y-3 text-sm relative z-10"><div class="flex items-start"><span class="w-6 text-emerald-500 text-center mr-2"><i class="fas fa-plus-circle"></i></span><span class="text-slate-600">${strength}</span></div><div class="flex items-start"><span class="w-6 text-rose-500 text-center mr-2"><i class="fas fa-minus-circle"></i></span><span class="text-slate-600">${weakness}</span></div></div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 relative z-10"><div class="flex justify-between items-center"><span class="text-xs text-slate-400 font-medium">Competitive Score</span><div class="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-500" style="width: ${comp.score}%"></div></div></div></div>
+                    </div>`;
             });
-
-            // Data Filtering
-            if (type === 'all') {
-                renderKeywords(keywords);
-            } else {
-                const filtered = keywords.filter(k => k.type.includes(type));
-                renderKeywords(filtered);
-            }
         }
 
-        // 3. Render Competitors
-        const compContainer = document.getElementById('competitor-grid');
-        competitors.forEach((comp, index) => {
-            compContainer.innerHTML += `
-                <div class="glass-card rounded-xl p-6 relative overflow-hidden group hover:shadow-lg transition-all duration-300" data-aos="fade-up" data-aos-delay="${index * 100}">
-                    <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                        <i class="fas fa-cut text-6xl text-slate-800"></i>
-                    </div>
-                    <div class="flex justify-between items-start mb-4 relative z-10">
-                        <div>
-                            <h3 class="font-bold text-lg text-slate-800 group-hover:text-indigo-600 transition-colors">${comp.name}</h3>
-                            <span class="inline-flex items-center text-xs text-slate-500 mt-1">
-                                <i class="fas fa-map-marker-alt mr-1"></i> ${comp.area}
-                            </span>
+        function renderAds() {
+            const container = document.getElementById('ads-grid');
+            container.innerHTML = '';
+            ads.forEach(ad => {
+                const name = currentLang === 'th' ? ad.name_th : ad.name_en;
+                const goal = currentLang === 'th' ? ad.goal_th : ad.goal_en;
+                const headline = currentLang === 'th' ? ad.headline_th : ad.headline_en;
+                const desc = currentLang === 'th' ? ad.desc_th : ad.desc_en;
+                const tags = currentLang === 'th' ? ad.tags_th : ad.tags_en;
+                
+                const headlinesSplit = headline.split('|').map(h => h.trim()).join(' | ');
+                const tagHtml = tags.map(t => `<span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded mr-1">#${t}</span>`).join('');
+                
+                container.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row group" data-aos="fade-up">
+                        <div class="p-6 md:w-1/3 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col justify-center">
+                            <div class="text-xs font-bold text-indigo-500 uppercase tracking-wide mb-1">${name}</div><div class="text-slate-800 font-bold text-lg mb-2 leading-tight">${goal}</div><div class="text-slate-500 text-sm mb-4">Max CPC: <span class="font-mono text-slate-700">${ad.cpc}</span></div><div class="mt-auto">${tagHtml}</div>
                         </div>
-                        <div class="text-sm font-bold text-slate-600 bg-slate-100 px-2 py-1 rounded">${comp.price}</div>
-                    </div>
-                    <div class="space-y-3 text-sm relative z-10">
-                        <div class="flex items-start">
-                            <span class="w-6 text-emerald-500 text-center mr-2"><i class="fas fa-plus-circle"></i></span>
-                            <span class="text-slate-600">${comp.strength}</span>
+                        <div class="p-6 md:w-2/3 relative">
+                            <div class="flex items-center gap-2 mb-2"><span class="font-bold text-slate-900 text-xs">Ad</span><span class="text-slate-500 text-xs">· www.silinsalon.com</span></div>
+                            <div class="group/copy relative"><h3 class="text-[#1a0dab] text-lg md:text-xl font-medium mb-1 hover:underline cursor-pointer pr-8">${headlinesSplit}</h3><button onclick="copyText('${headlinesSplit}')" class="copy-btn absolute top-0 right-0 text-slate-300 hover:text-indigo-600 transition-colors" title="Copy Headline"><i class="far fa-copy"></i></button></div>
+                            <div class="group/copy relative mt-1"><p class="text-[#4d5156] text-sm leading-relaxed pr-8">${desc}</p><button onclick="copyText('${desc}')" class="copy-btn absolute top-0 right-0 text-slate-300 hover:text-indigo-600 transition-colors" title="Copy Description"><i class="far fa-copy"></i></button></div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex gap-4 text-xs text-slate-500"><span class="flex items-center gap-1"><i class="fas fa-phone-alt text-slate-400"></i> Call</span><span class="flex items-center gap-1"><i class="fas fa-map-marker-alt text-slate-400"></i> Directions</span></div>
                         </div>
-                        <div class="flex items-start">
-                            <span class="w-6 text-rose-500 text-center mr-2"><i class="fas fa-minus-circle"></i></span>
-                            <span class="text-slate-600">${comp.weakness}</span>
-                        </div>
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-slate-100 relative z-10">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-slate-400 font-medium">Competitive Score</span>
-                            <div class="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div class="h-full bg-indigo-500" style="width: ${comp.score}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
+                    </div>`;
+            });
+        }
 
-        // 4. Render Ads with Copy Functionality
-        const adsContainer = document.getElementById('ads-grid');
-        ads.forEach((ad, index) => {
-            const headlines = ad.headline.split('|').map(h => h.trim()).join(' | ');
-            const tagHtml = ad.tags.map(t => `<span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded mr-1">#${t}</span>`).join('');
-
-            adsContainer.innerHTML += `
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row group" data-aos="fade-up">
-                    <!-- Strategy Side -->
-                    <div class="p-6 md:w-1/3 bg-slate-50 border-b md:border-b-0 md:border-r border-slate-100 flex flex-col justify-center">
-                        <div class="text-xs font-bold text-indigo-500 uppercase tracking-wide mb-1">${ad.name}</div>
-                        <div class="text-slate-800 font-bold text-lg mb-2 leading-tight">${ad.goal}</div>
-                        <div class="text-slate-500 text-sm mb-4">Max CPC: <span class="font-mono text-slate-700">${ad.cpc}</span></div>
-                        <div class="mt-auto">${tagHtml}</div>
-                    </div>
-                    
-                    <!-- Preview Side -->
-                    <div class="p-6 md:w-2/3 relative">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="font-bold text-slate-900 text-xs">Ad</span>
-                            <span class="text-slate-500 text-xs">· www.silinsalon.com</span>
+        function renderActionPlan() {
+            const container = document.getElementById('action-timeline');
+            container.innerHTML = '';
+            actionPlan.forEach((plan, index) => {
+                const title = currentLang === 'th' ? plan.title_th : plan.title_en;
+                const tasks = currentLang === 'th' ? plan.tasks_th : plan.tasks_en;
+                const taskHtml = tasks.map(t => `<li class="flex items-start text-slate-600 text-sm mb-2"><span class="w-1.5 h-1.5 bg-slate-300 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>${t}</li>`).join('');
+                
+                container.innerHTML += `
+                    <div class="relative pl-8 md:pl-0" data-aos="fade-left" data-aos-delay="${index * 100}">
+                        <div class="hidden md:block absolute left-[50%] top-0 bottom-0 w-px bg-slate-200 -translate-x-1/2"></div>
+                        <div class="flex flex-col md:flex-row items-center justify-between md:gap-8 group">
+                            <div class="md:w-1/2 md:text-right mb-4 md:mb-0 relative order-1 md:order-1"><div class="inline-block px-4 py-1 rounded-full ${plan.color} text-white text-xs font-bold shadow-md mb-2">${plan.week}</div><h4 class="text-lg font-bold text-slate-800">${title}</h4></div>
+                            <div class="absolute left-0 md:left-1/2 w-8 h-8 rounded-full ${plan.color} flex items-center justify-center text-white text-xs shadow-lg z-10 -translate-x-1/2 md:translate-x-[-50%] order-2"><i class="fas ${plan.icon}"></i></div>
+                            <div class="md:w-1/2 bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all order-3 w-full"><ul class="">${taskHtml}</ul></div>
                         </div>
-                        <div class="group/copy relative">
-                            <h3 class="text-[#1a0dab] text-lg md:text-xl font-medium mb-1 hover:underline cursor-pointer pr-8">
-                                ${headlines}
-                            </h3>
-                            <button onclick="copyText('${headlines}')" class="copy-btn absolute top-0 right-0 text-slate-300 hover:text-indigo-600 transition-colors" title="Copy Headline">
-                                <i class="far fa-copy"></i>
-                            </button>
-                        </div>
-                        <div class="group/copy relative mt-1">
-                            <p class="text-[#4d5156] text-sm leading-relaxed pr-8">
-                                ${ad.desc}
-                            </p>
-                            <button onclick="copyText('${ad.desc}')" class="copy-btn absolute top-0 right-0 text-slate-300 hover:text-indigo-600 transition-colors" title="Copy Description">
-                                <i class="far fa-copy"></i>
-                            </button>
-                        </div>
-                        
-                        <!-- Mobile Call Extensions -->
-                        <div class="mt-4 pt-3 border-t border-slate-100 flex gap-4 text-xs text-slate-500">
-                            <span class="flex items-center gap-1"><i class="fas fa-phone-alt text-slate-400"></i> Call</span>
-                            <span class="flex items-center gap-1"><i class="fas fa-map-marker-alt text-slate-400"></i> Directions</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        // 5. Render Action Plan Timeline
-        const actionContainer = document.getElementById('action-timeline');
-        actionPlan.forEach((plan, index) => {
-            const taskHtml = plan.tasks.map(t => `<li class="flex items-start text-slate-600 text-sm mb-2"><span class="w-1.5 h-1.5 bg-slate-300 rounded-full mt-1.5 mr-3 flex-shrink-0"></span>${t}</li>`).join('');
-            
-            actionContainer.innerHTML += `
-                <div class="relative pl-8 md:pl-0" data-aos="fade-left" data-aos-delay="${index * 100}">
-                    <div class="hidden md:block absolute left-[50%] top-0 bottom-0 w-px bg-slate-200 -translate-x-1/2"></div>
-                    
-                    <div class="flex flex-col md:flex-row items-center justify-between md:gap-8 group">
-                        <!-- Time (Left on Desktop) -->
-                        <div class="md:w-1/2 md:text-right mb-4 md:mb-0 relative order-1 md:order-1">
-                            <div class="inline-block px-4 py-1 rounded-full ${plan.color} text-white text-xs font-bold shadow-md mb-2">${plan.week}</div>
-                            <h4 class="text-lg font-bold text-slate-800">${plan.title}</h4>
-                        </div>
-                        
-                        <!-- Icon (Center) -->
-                        <div class="absolute left-0 md:left-1/2 w-8 h-8 rounded-full ${plan.color} flex items-center justify-center text-white text-xs shadow-lg z-10 -translate-x-1/2 md:translate-x-[-50%] order-2">
-                            <i class="fas ${plan.icon}"></i>
-                        </div>
-
-                        <!-- Content (Right on Desktop) -->
-                        <div class="md:w-1/2 bg-white p-5 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all order-3 w-full">
-                            <ul class="">
-                                ${taskHtml}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
+                    </div>`;
+            });
+        }
 
         // --- CHART JS ---
         const ctx = document.getElementById('intentChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Commercial (ซื้อ)', 'Informational (หาข้อมูล)', 'Local (หาร้าน)', 'Navigational (หาแบรนด์)'],
-                datasets: [{
-                    data: [35, 25, 30, 10],
-                    backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b'],
-                    borderWidth: 0,
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { display: false }
-                },
-                animation: {
-                    animateScale: true,
-                    animateRotate: true
-                }
-            }
-        });
+        const chart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Commercial', 'Informational', 'Local', 'Navigational'], datasets: [{ data: [35, 25, 30, 10], backgroundColor: ['#4f46e5', '#3b82f6', '#10b981', '#f59e0b'], borderWidth: 0, hoverOffset: 10 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } }, animation: { animateScale: true, animateRotate: true } } });
 
         // --- UTILITIES ---
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copied to clipboard!');
-            });
-        }
-
+        function copyText(text) { navigator.clipboard.writeText(text).then(() => { alert('Copied to clipboard!'); }); }
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active', 'text-indigo-600');
-                btn.classList.add('text-slate-600');
-            });
-            ['summary', 'keywords', 'competitors', 'ads', 'action'].forEach(id => {
-                const el = document.getElementById('content-' + id);
-                el.classList.add('hidden');
-                el.classList.remove('block');
-            });
-
-            const activeBtn = document.getElementById('tab-' + tabId);
-            activeBtn.classList.add('active', 'text-indigo-600');
-            activeBtn.classList.remove('text-slate-600');
-
+            document.querySelectorAll('.tab-btn').forEach(btn => { btn.classList.remove('active', 'text-indigo-600'); btn.classList.add('text-slate-600'); });
+            ['summary', 'keywords', 'competitors', 'ads', 'action'].forEach(id => { const el = document.getElementById('content-' + id); el.classList.add('hidden'); el.classList.remove('block'); });
+            document.getElementById('tab-' + tabId).classList.add('active', 'text-indigo-600');
+            document.getElementById('tab-' + tabId).classList.remove('text-slate-600');
             const content = document.getElementById('content-' + tabId);
-            content.classList.remove('hidden');
-            content.classList.add('block');
-            
-            // Re-trigger AOS
+            content.classList.remove('hidden'); content.classList.add('block');
             setTimeout(() => { AOS.refresh(); }, 100);
         }
+
+        function filterKeywords(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if(btn.textContent.includes(type === 'all' ? 'ทั้งหมด' : type) || btn.getAttribute('data-en') === type) {
+                    btn.classList.add('bg-indigo-600', 'text-white'); btn.classList.remove('bg-slate-100', 'text-slate-600');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white'); btn.classList.add('bg-slate-100', 'text-slate-600');
+                }
+            });
+            renderKeywords(type === 'all' ? keywords : keywords.filter(k => k.type.includes(type)));
+        }
+
+        function renderAll() {
+            renderBranches();
+            renderKeywords(keywords);
+            renderCompetitors();
+            renderAds();
+            renderActionPlan();
+            
+            // Update Chart Labels
+            if(currentLang === 'th') {
+                chart.data.labels = ['ซื้อสินค้า', 'หาข้อมูล', 'หาร้านค้า', 'นำทาง'];
+            } else {
+                chart.data.labels = ['Commercial', 'Informational', 'Local', 'Navigational'];
+            }
+            chart.update();
+        }
+
+        // --- LANGUAGE TOGGLE ---
+        function toggleLanguage() {
+            currentLang = currentLang === 'th' ? 'en' : 'th';
+            
+            // Toggle Static Text
+            document.querySelectorAll('.lang-text').forEach(el => {
+                if (currentLang === 'th') {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = el.getAttribute('data-th');
+                    else el.innerHTML = el.getAttribute('data-th');
+                } else {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = el.getAttribute('data-en');
+                    else el.innerHTML = el.getAttribute('data-en');
+                }
+            });
+
+            // Re-render Dynamic Content
+            renderAll();
+        }
+
+        // Initial Render
+        renderAll();
+
     </script>
 </body>
 </html>
