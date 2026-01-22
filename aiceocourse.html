@@ -19,21 +19,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body { margin: 0; background-color: #000; font-family: 'Prompt', sans-serif; }
+        body { margin: 0; background-color: #030303; font-family: 'Prompt', sans-serif; scroll-behavior: smooth; }
         
         /* Custom Scrollbar */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
+            background: #0a0a0a;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
+            background: #333;
+            border-radius: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.4);
+            background: #555;
         }
     </style>
 </head>
@@ -73,46 +73,11 @@
 
         // --- MAIN APP COMPONENT ---
         function App() {
-          const [currentSlide, setCurrentSlide] = useState(0);
-          const [animating, setAnimating] = useState(false);
-
-          const totalSlides = 15;
-
-          const nextSlide = () => {
-            if (currentSlide < totalSlides - 1) {
-              setAnimating(true);
-              setCurrentSlide(currentSlide + 1);
-            }
-          };
-
-          const prevSlide = () => {
-            if (currentSlide > 0) {
-              setAnimating(true);
-              setCurrentSlide(currentSlide - 1);
-            }
-          };
-
-          useEffect(() => {
-            if (animating) {
-              const timer = setTimeout(() => setAnimating(false), 700);
-              return () => clearTimeout(timer);
-            }
-          }, [animating]);
-
-          const handleKeyDown = (e) => {
-            if (e.key === 'ArrowRight') nextSlide();
-            if (e.key === 'ArrowLeft') prevSlide();
-          };
-
-          useEffect(() => {
-            window.addEventListener('keydown', handleKeyDown);
-            return () => window.removeEventListener('keydown', handleKeyDown);
-          }, [currentSlide]);
 
           // --- ULTRA-MODERN AGENCY DESIGN SYSTEM ---
           
-          const SlideLayout = ({ children, title, subtitle, hideFooter = false }) => (
-            <div className="flex flex-col h-full bg-[#030303] text-white p-8 md:p-14 relative overflow-hidden font-sans selection:bg-[#3b82f6] selection:text-white transition-colors duration-700">
+          const SlideLayout = ({ children, title, subtitle, hideFooter = false, index, total }) => (
+            <div className="flex flex-col min-h-screen w-full bg-[#030303] text-white p-6 md:p-16 relative overflow-hidden font-sans selection:bg-[#3b82f6] selection:text-white border-b border-white/5">
               {/* Internal Styles */}
               <style>
                 {`
@@ -144,20 +109,14 @@
                     pointer-events: none;
                     z-index: 1;
                   }
-
-                  .slide-enter { animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
-                  @keyframes fadeUp {
-                    from { opacity: 0; transform: translateY(30px) scale(0.98); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
-                  }
                 `}
               </style>
 
               <div className="bg-noise"></div>
 
               {/* Ambient Lighting */}
-              <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none animate-pulse duration-[5000ms]"></div>
-              <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none"></div>
+              <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] md:w-[800px] md:h-[800px] bg-blue-600/5 rounded-full blur-[150px] pointer-events-none"></div>
+              <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none"></div>
 
               {/* Technical Grid Lines */}
               <div className="absolute inset-0 z-0 opacity-10 pointer-events-none" 
@@ -165,7 +124,7 @@
               </div>
 
               {/* Header */}
-              <div className="z-20 mb-10 flex justify-between items-end border-b border-white/20 pb-6 relative">
+              <div className="z-20 mb-10 flex flex-col md:flex-row justify-between md:items-end border-b border-white/20 pb-6 relative">
                 <div className="space-y-3">
                    {subtitle && (
                     <div className="flex items-center gap-3">
@@ -184,20 +143,19 @@
               </div>
 
               {/* Content */}
-              <div className={`z-20 flex-grow overflow-y-auto custom-scrollbar relative slide-enter`}>
+              <div className="z-20 flex-grow relative">
                 {children}
               </div>
 
               {/* Footer */}
               {!hideFooter && (
-                <div className="z-20 mt-8 flex justify-between items-end text-xs uppercase font-avenir tracking-widest text-white/70 pt-6 font-bold border-t border-white/10">
+                <div className="z-20 mt-12 flex justify-between items-end text-xs uppercase font-avenir tracking-widest text-white/70 pt-6 font-bold border-t border-white/10">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                     <span>CONFIDENTIAL // K.BOY GROUP</span>
                   </div>
-                  {/* Centered Page Number to avoid overlap */}
-                  <span className="absolute left-1/2 transform -translate-x-1/2">SLIDE {currentSlide + 1 < 10 ? `0${currentSlide + 1}` : currentSlide + 1} / {totalSlides}</span>
                   <span className="hidden md:block">BANGKOK, TH</span>
+                  <span>SECTION {index < 9 ? `0${index + 1}` : index + 1}</span>
                 </div>
               )}
             </div>
@@ -205,25 +163,25 @@
 
           // --- SLIDES ---
 
-          const Slide1_Title = () => (
-            <SlideLayout title="" hideFooter>
-              <div className="flex flex-col h-full justify-between py-4 relative z-10">
+          const Slide1_Title = (props) => (
+            <SlideLayout title="" hideFooter {...props}>
+              <div className="flex flex-col h-full justify-between py-4 relative z-10 min-h-[60vh]">
                 <div className="space-y-6">
                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/40 bg-white/10 text-white text-sm tracking-widest font-avenir uppercase backdrop-blur-md font-bold">
                       <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span> Live from Bangkok
                    </div>
                    
-                   <h1 className="text-[5rem] md:text-[9.5rem] font-medium tracking-tighter leading-[0.85] text-white mix-blend-overlay opacity-90">
+                   <h1 className="text-[4rem] md:text-[9.5rem] font-medium tracking-tighter leading-[0.85] text-white mix-blend-overlay opacity-90 break-words">
                      K.BOY
                    </h1>
-                   <h1 className="text-[5rem] md:text-[9.5rem] font-bold tracking-tighter leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-white mt-[-20px] md:mt-[-40px]">
+                   <h1 className="text-[4rem] md:text-[9.5rem] font-bold tracking-tighter leading-[0.85] text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-white mt-[-10px] md:mt-[-40px]">
                      AI PROGRAM
                    </h1>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end border-t border-white/20 pt-10">
                   <div className="md:col-span-7">
-                     <p className="text-2xl md:text-3xl text-white font-light leading-snug">
+                     <p className="text-xl md:text-3xl text-white font-light leading-snug">
                        หลักสูตรออฟไลน์สำหรับผู้นำธุรกิจ<br/>
                        <span className="text-white font-medium">สร้างระบบ AI ที่วัดผล ROI ได้จริง</span>
                      </p>
@@ -246,8 +204,8 @@
             </SlideLayout>
           );
 
-          const Slide2_Gap = () => (
-            <SlideLayout title="The Market Gap" subtitle="ช่องว่างในตลาด AI ไทย">
+          const Slide2_Gap = (props) => (
+            <SlideLayout title="The Market Gap" subtitle="ช่องว่างในตลาด AI ไทย" {...props}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12 h-full">
                 <div className="flex flex-col gap-6">
                     <div className="glass-panel p-8 rounded-2xl border-l-4 border-l-red-500 relative overflow-hidden group">
@@ -255,7 +213,7 @@
                            <Activity size={80} />
                         </div>
                         <h3 className="text-white font-avenir text-sm uppercase tracking-widest mb-4 font-bold">CRITICAL INSIGHT</h3>
-                        <p className="text-3xl text-white font-light leading-tight">
+                        <p className="text-2xl md:text-3xl text-white font-light leading-tight">
                            ตลาด AI 70% คือคอร์สออนไลน์ทั่วไป<br/>
                            <span className="font-medium text-white/60">ที่ขาดบริบททางธุรกิจ</span>
                         </p>
@@ -307,8 +265,8 @@
             </SlideLayout>
           );
 
-          const Slide3_Problem = () => (
-            <SlideLayout title="The Executive Dilemma" subtitle="ปัญหาโลกแตกของผู้บริหาร">
+          const Slide3_Problem = (props) => (
+            <SlideLayout title="The Executive Dilemma" subtitle="ปัญหาโลกแตกของผู้บริหาร" {...props}>
               <div className="flex flex-col justify-center h-full">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                    {[
@@ -322,14 +280,14 @@
                             <span className="font-avenir text-xs text-white font-bold uppercase border border-white/30 px-3 py-1 rounded">{card.label}</span>
                             {i === 2 && <Zap size={16} className="text-white animate-pulse"/>}
                          </div>
-                         <h3 className={`text-6xl font-light tracking-tighter mb-4 ${card.accent}`}>{card.val}</h3>
+                         <h3 className={`text-5xl md:text-6xl font-light tracking-tighter mb-4 ${card.accent}`}>{card.val}</h3>
                        </div>
                        <p className="text-white/80 text-sm leading-relaxed border-t border-white/20 pt-4 font-avenir">{card.desc}</p>
                      </div>
                    ))}
                 </div>
                 
-                <div className="text-center relative">
+                <div className="text-center relative py-12">
                    <div className="absolute left-1/2 -top-6 w-px h-6 bg-gradient-to-b from-transparent to-white/30"></div>
                    <p className="text-2xl md:text-3xl font-light text-white italic mb-8">
                      "จะคุ้มทุนได้อย่างไร? <span className="text-white/60">ถ้าทีมงานยังทำงานแบบเดิม</span>"
@@ -342,16 +300,16 @@
             </SlideLayout>
           );
 
-          const Slide4_Solution = () => (
-            <SlideLayout title="The Methodology" subtitle="กระบวนการปั้นระบบ AI">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-full items-center border-t border-b border-white/20 divide-y md:divide-y-0 md:divide-x divide-white/20">
+          const Slide4_Solution = (props) => (
+            <SlideLayout title="The Methodology" subtitle="กระบวนการปั้นระบบ AI" {...props}>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-0 h-full items-center md:border-t md:border-b border-white/20 md:divide-x divide-white/20">
                  
                  {[
                    { phase: "01", title: "Diagnostics", desc: "Audit ข้อมูลหลังบ้านของคุณสดๆ หาจุดคอขวด (Bottleneck) ที่ AI แก้ได้ทันที", icon: <Fingerprint className="w-8 h-8"/> },
                    { phase: "02", title: "System Build", desc: "สร้างจริง: AI Sales Forecasting, CRM Automation หรือ Custom Agent", icon: <Layers className="w-8 h-8"/> },
                    { phase: "03", title: "Scale & KPI", desc: "Deploy ใช้งานจริง พร้อมตั้งค่า KPI วัดผล Efficiency Gain (เป้าหมาย 20-40%)", icon: <Activity className="w-8 h-8"/> }
                  ].map((item, i) => (
-                   <div key={i} className="group h-full p-10 flex flex-col justify-between hover:bg-white/[0.05] transition-colors relative overflow-hidden">
+                   <div key={i} className="group h-full p-10 flex flex-col justify-between hover:bg-white/[0.05] transition-colors relative overflow-hidden border-b md:border-b-0 border-white/20 last:border-b-0">
                       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 to-indigo-600 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700"></div>
                       
                       <div>
@@ -372,8 +330,8 @@
             </SlideLayout>
           );
 
-          const Slide5_Authority = () => (
-            <SlideLayout title="Why K.Boy?" subtitle="CEO นักวางกลยุทธ์">
+          const Slide5_Authority = (props) => (
+            <SlideLayout title="Why K.Boy?" subtitle="CEO นักวางกลยุทธ์" {...props}>
               <div className="grid grid-cols-1 md:grid-cols-12 gap-12 h-full items-center">
                 <div className="md:col-span-5 space-y-12">
                   <h3 className="text-4xl md:text-5xl font-light text-white leading-tight">
@@ -437,38 +395,40 @@
             </SlideLayout>
           );
 
-          const Slide6_Diff = () => (
-            <SlideLayout title="Differentiation" subtitle="จุดเด่นที่แตกต่าง">
-              <div className="glass-panel rounded-2xl overflow-hidden border-white/20">
-                <div className="grid grid-cols-4 bg-white/5 border-b border-white/20">
-                    {["Feature", "K.Boy Offline AI", "Online Course", "Bootcamp"].map((head, i) => (
-                        <div key={i} className={`p-6 font-avenir text-xs font-bold uppercase tracking-widest ${i === 1 ? 'text-white bg-white/10' : 'text-white/60'}`}>
-                            {head}
+          const Slide6_Diff = (props) => (
+            <SlideLayout title="Differentiation" subtitle="จุดเด่นที่แตกต่าง" {...props}>
+              <div className="glass-panel rounded-2xl overflow-hidden border-white/20 overflow-x-auto">
+                <div className="min-w-[600px]">
+                    <div className="grid grid-cols-4 bg-white/5 border-b border-white/20">
+                        {["Feature", "K.Boy Offline AI", "Online Course", "Bootcamp"].map((head, i) => (
+                            <div key={i} className={`p-6 font-avenir text-xs font-bold uppercase tracking-widest ${i === 1 ? 'text-white bg-white/10' : 'text-white/60'}`}>
+                                {head}
+                            </div>
+                        ))}
+                    </div>
+                    {[
+                      { feature: "Format", kboy: "In-person Cohorts", c1: "Self-paced Video", c2: "Weekend Hacks" },
+                      { feature: "Focus", kboy: "Business ROI (กำไร)", c1: "Tech Skills", c2: "Coding Basics" },
+                      { feature: "Guarantee", kboy: "วัดผลใน 90 วัน", c1: "None", c2: "None" },
+                      { feature: "Connection", kboy: "Vetted CEOs Only", c1: "Anyone", c2: "Mixed" }
+                    ].map((row, i) => (
+                        <div key={i} className="grid grid-cols-4 border-b border-white/10 hover:bg-white/[0.05] transition-colors group">
+                            <div className="p-6 text-white font-avenir font-bold text-sm flex items-center">{row.feature}</div>
+                            <div className="p-6 text-white font-avenir font-bold text-sm bg-blue-500/10 relative group-hover:bg-blue-500/20 transition-colors flex items-center">
+                                {row.kboy}
+                                <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white opacity-50"></div>
+                            </div>
+                            <div className="p-6 text-white/60 font-avenir text-sm flex items-center">{row.c1}</div>
+                            <div className="p-6 text-white/60 font-avenir text-sm flex items-center">{row.c2}</div>
                         </div>
                     ))}
                 </div>
-                {[
-                  { feature: "Format", kboy: "In-person Cohorts", c1: "Self-paced Video", c2: "Weekend Hacks" },
-                  { feature: "Focus", kboy: "Business ROI (กำไร)", c1: "Tech Skills", c2: "Coding Basics" },
-                  { feature: "Guarantee", kboy: "วัดผลใน 90 วัน", c1: "None", c2: "None" },
-                  { feature: "Connection", kboy: "Vetted CEOs Only", c1: "Anyone", c2: "Mixed" }
-                ].map((row, i) => (
-                    <div key={i} className="grid grid-cols-4 border-b border-white/10 hover:bg-white/[0.05] transition-colors group">
-                        <div className="p-6 text-white font-avenir font-bold text-sm flex items-center">{row.feature}</div>
-                        <div className="p-6 text-white font-avenir font-bold text-sm bg-blue-500/10 relative group-hover:bg-blue-500/20 transition-colors flex items-center">
-                            {row.kboy}
-                            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-white opacity-50"></div>
-                        </div>
-                        <div className="p-6 text-white/60 font-avenir text-sm flex items-center">{row.c1}</div>
-                        <div className="p-6 text-white/60 font-avenir text-sm flex items-center">{row.c2}</div>
-                    </div>
-                ))}
               </div>
             </SlideLayout>
           );
 
-          const Slide7_Persona = () => (
-            <SlideLayout title="Target Audience" subtitle="System Thinkers Only">
+          const Slide7_Persona = (props) => (
+            <SlideLayout title="Target Audience" subtitle="System Thinkers Only" {...props}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-16 h-full items-center">
                  <div className="relative">
                     <div className="absolute inset-0 bg-blue-500/20 blur-[60px] rounded-full"></div>
@@ -514,10 +474,10 @@
             </SlideLayout>
           );
 
-          const Slide8_Delivery = () => (
-            <SlideLayout title="The Experience" subtitle="Premium Offline Delivery">
+          const Slide8_Delivery = (props) => (
+            <SlideLayout title="The Experience" subtitle="Premium Offline Delivery" {...props}>
               <div className="flex flex-col h-full gap-6">
-                 <div className="grid grid-cols-2 gap-6 flex-grow">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-grow">
                     {[
                         { icon: <MapPin className="w-8 h-8"/>, title: "Exclusive Venue", desc: "Premium space (WeWork Sathorn) บรรยากาศส่งเสริมสมาธิ" },
                         { icon: <Target className="w-8 h-8"/>, title: "70/30 Split", desc: "70% Hands-on Build\n30% Framework Strategy" }
@@ -529,7 +489,7 @@
                         </div>
                     ))}
                  </div>
-                 <div className="glass-panel p-10 rounded-2xl flex items-center gap-8 bg-gradient-to-r from-blue-900/20 to-transparent border border-white/20">
+                 <div className="glass-panel p-10 rounded-2xl flex flex-col md:flex-row items-center gap-8 bg-gradient-to-r from-blue-900/20 to-transparent border border-white/20">
                      <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(37,99,235,0.4)]">
                          <Users size={32} />
                      </div>
@@ -542,8 +502,8 @@
             </SlideLayout>
           );
 
-          const Slide9_Results = () => (
-            <SlideLayout title="Proven Results" subtitle="Pilot Class 2025 Data">
+          const Slide9_Results = (props) => (
+            <SlideLayout title="Proven Results" subtitle="Pilot Class 2025 Data" {...props}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 {[
                   { label: "Efficiency Gain", val: "32%", sub: "vs 15% Avg" },
@@ -576,8 +536,8 @@
             </SlideLayout>
           );
 
-          const Slide10_Pricing = () => (
-            <SlideLayout title="Select Your Tier" subtitle="Investment Options">
+          const Slide10_Pricing = (props) => (
+            <SlideLayout title="Select Your Tier" subtitle="Investment Options" {...props}>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full pt-4 items-stretch">
                 
                 {/* Tier 1 */}
@@ -597,7 +557,7 @@
                 </div>
 
                 {/* Tier 2 - Hero */}
-                <div className="glass-panel p-1 rounded-2xl relative flex flex-col shadow-[0_0_50px_rgba(59,130,246,0.15)] transform scale-105 z-10 bg-gradient-to-b from-blue-500/20 to-transparent">
+                <div className="glass-panel p-1 rounded-2xl relative flex flex-col shadow-[0_0_50px_rgba(59,130,246,0.15)] z-10 bg-gradient-to-b from-blue-500/20 to-transparent transform md:scale-105">
                     <div className="bg-[#050505] w-full h-full rounded-xl p-8 flex flex-col relative overflow-hidden">
                         <div className="absolute top-0 right-0 p-4">
                             <span className="text-[10px] font-bold uppercase bg-white text-black px-2 py-1 rounded font-avenir">Popular</span>
@@ -638,9 +598,9 @@
             </SlideLayout>
           );
 
-          const Slide11_GTM = () => (
-            <SlideLayout title="Go-to-Market" subtitle="Launch Plan Q2 2026">
-               <div className="flex flex-col h-full justify-between">
+          const Slide11_GTM = (props) => (
+            <SlideLayout title="Go-to-Market" subtitle="Launch Plan Q2 2026" {...props}>
+               <div className="flex flex-col h-full justify-between gap-8">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                      {[
                        { id: "01", title: "Content Pillars", text: "วิดีโอซีรีส์ K.Boy: 'The CEO's Guide to AI' เน้นเนื้อหา High-value", icon: <Play size={20}/> },
@@ -660,7 +620,7 @@
                      ))}
                   </div>
 
-                  <div className="glass-panel p-8 rounded-2xl flex justify-between items-center mt-8 bg-gradient-to-r from-blue-900/10 to-transparent border-t border-white/20">
+                  <div className="glass-panel p-8 rounded-2xl flex flex-col md:flex-row justify-between items-center mt-8 bg-gradient-to-r from-blue-900/10 to-transparent border-t border-white/20">
                      <span className="font-avenir text-xs text-white font-bold uppercase tracking-widest">Projected Revenue</span>
                      <div className="text-right">
                         <span className="text-5xl font-light text-white tracking-tight">฿4,500,000</span>
@@ -671,9 +631,9 @@
             </SlideLayout>
           );
 
-          const Slide12_CTA = () => (
-            <SlideLayout title="" hideFooter>
-              <div className="flex flex-col items-center justify-center h-full text-center space-y-12 z-20">
+          const Slide12_CTA = (props) => (
+            <SlideLayout title="" hideFooter {...props}>
+              <div className="flex flex-col items-center justify-center h-full text-center space-y-12 z-20 min-h-[50vh]">
                  <div className="relative">
                      <div className="absolute inset-0 bg-blue-500 blur-[100px] opacity-20 rounded-full"></div>
                      <h2 className="text-5xl md:text-8xl font-bold text-white tracking-tighter uppercase leading-[0.9] relative z-10">
@@ -703,8 +663,8 @@
           );
 
           // New Slide 13: Option 1 & 2
-          const Slide13_Options1_2 = () => (
-            <SlideLayout title="Partnership Options" subtitle="Fee-Based Models">
+          const Slide13_Options1_2 = (props) => (
+            <SlideLayout title="Partnership Options" subtitle="Fee-Based Models" {...props}>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
                   {/* Option 1 */}
                   <div className="glass-panel p-8 rounded-2xl flex flex-col h-full border-blue-500/20">
@@ -768,8 +728,8 @@
           );
 
           // New Slide 14: Option 3
-          const Slide14_Option3 = () => (
-            <SlideLayout title="Growth Partner" subtitle="Recommended Model">
+          const Slide14_Option3 = (props) => (
+            <SlideLayout title="Growth Partner" subtitle="Recommended Model" {...props}>
                <div className="flex flex-col h-full justify-center">
                   <div className="glass-panel p-1 rounded-3xl relative w-full max-w-5xl mx-auto shadow-[0_0_80px_rgba(59,130,246,0.15)] bg-gradient-to-br from-blue-500/30 to-transparent">
                      <div className="bg-[#050505] rounded-[22px] p-10 md:p-12 relative overflow-hidden">
@@ -846,9 +806,10 @@
           );
 
           // New Slide 15: Comparison Table
-          const Slide15_Comparison = () => (
-            <SlideLayout title="Model Comparison" subtitle="Summary View">
-               <div className="glass-panel rounded-2xl overflow-hidden mt-4">
+          const Slide15_Comparison = (props) => (
+            <SlideLayout title="Model Comparison" subtitle="Summary View" {...props}>
+               <div className="glass-panel rounded-2xl overflow-hidden mt-4 overflow-x-auto">
+                 <div className="min-w-[600px]">
                    {/* Header */}
                    <div className="grid grid-cols-4 bg-white/5 border-b border-white/20">
                        <div className="p-6"></div>
@@ -895,6 +856,7 @@
                            </div>
                        </div>
                    ))}
+                  </div>
                </div>
             </SlideLayout>
           );
@@ -916,32 +878,22 @@
             Slide14_Option3,
             Slide15_Comparison
           ];
-
-          const CurrentSlideComponent = slides[currentSlide];
-
+          
           return (
-            <div className="h-screen w-full flex flex-col bg-black items-center justify-center p-4 md:p-8">
-              <div className="w-full max-w-[1400px] aspect-video shadow-2xl overflow-hidden relative rounded-2xl border border-white/10 bg-[#030303]">
-                <CurrentSlideComponent />
-                
-                {/* Controls Overlay - Repositioned to Right Center to avoid blocking footer */}
-                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-3 z-50">
-                  <button 
-                    onClick={prevSlide}
-                    disabled={currentSlide === 0}
-                    className={`w-12 h-12 flex items-center justify-center rounded-full border border-white/10 backdrop-blur-md transition-all ${currentSlide === 0 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-white hover:text-black text-white hover:border-white'}`}
-                  >
-                    <ChevronLeft size={20} /> {/* Up arrow logic visually better on side, but keeping left/right logic */}
-                  </button>
-                  <button 
-                    onClick={nextSlide}
-                    disabled={currentSlide === totalSlides - 1}
-                    className={`w-12 h-12 flex items-center justify-center rounded-full border border-white/10 backdrop-blur-md transition-all ${currentSlide === totalSlides - 1 ? 'opacity-20 cursor-not-allowed' : 'hover:bg-white hover:text-black text-white hover:border-white'}`}
-                  >
-                    <ChevronRight size={20} />
-                  </button>
+            <div className="w-full bg-[#030303]">
+                {/* Header/Nav for Scrolling context (Optional, stick to top) */}
+                <div className="fixed top-0 left-0 w-full z-50 pointer-events-none">
+                    <div className="max-w-[1400px] mx-auto p-4 flex justify-between items-center opacity-50 mix-blend-difference text-white">
+                        <span className="font-bold tracking-widest text-xs uppercase">K.Boy AI Strategy</span>
+                        <span className="text-[10px]">SCROLL TO NAVIGATE</span>
+                    </div>
                 </div>
-              </div>
+
+                <div className="w-full max-w-[1400px] mx-auto shadow-2xl overflow-hidden relative border-x border-white/10 bg-[#030303]">
+                   {slides.map((SlideComponent, index) => (
+                       <SlideComponent key={index} index={index} total={slides.length} />
+                   ))}
+                </div>
             </div>
           );
         }
