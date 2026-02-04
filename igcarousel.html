@@ -1,0 +1,764 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Plus, 
+  Send, 
+  Check, 
+  Edit3, 
+  ChevronRight, 
+  ChevronLeft,
+  RotateCcw, 
+  Download, 
+  History, 
+  Layout, 
+  Image as ImageIcon,
+  Loader2,
+  Trash2,
+  Layers,
+  ArrowRight,
+  Wand2,
+  AlertCircle,
+  Play,
+  Type,
+  Maximize,
+  Save,
+  Settings
+} from 'lucide-react';
+
+const apiKey = ""; // Environment provides this
+
+const googleFonts = [
+  "Anuphan",
+  "IBM Plex Sans Thai",
+  "Noto Sans Thai",
+  "Prompt",
+  "Kanit",
+  "Sarabun",
+  "Mitr",
+  "Chakra Petch",
+  "Bai Jamjuree"
+];
+
+const App = () => {
+  const [step, setStep] = useState('input'); 
+  // Initial state with 4 slides as default, but can vary
+  const [carouselData, setCarouselData] = useState([
+    { id: 1, text: '', subtext: '', imageUrl: null, status: 'pending', label: 'หน้าปก (Cover)', type: 'cover' },
+    { id: 2, text: '', subtext: '', imageUrl: null, status: 'pending', label: 'เนื้อหา (Content)', type: 'content' },
+    { id: 3, text: '', subtext: '', imageUrl: null, status: 'pending', label: 'เนื้อหา (Content)', type: 'content' },
+    { id: 4, text: '', subtext: '', imageUrl: null, status: 'pending', label: 'สรุป (Outro)', type: 'outro' },
+  ]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSplitting, setIsSplitting] = useState(false);
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const [longParagraph, setLongParagraph] = useState("");
+  const [showMagicInput, setShowMagicInput] = useState(true); 
+  const [selectedFont, setSelectedFont] = useState("Anuphan"); // Default Font
+  const [error, setError] = useState(null);
+  
+  // UI State
+  const [activeTab, setActiveTab] = useState('creator');
+
+  const updateSlideData = (index, field, value) => {
+    const newData = [...carouselData];
+    newData[index][field] = value;
+    // Reset image if text changes to force re-render
+    if (field === 'text' || field === 'subtext') {
+        newData[index].imageUrl = null;
+        newData[index].status = 'pending';
+    }
+    setCarouselData(newData);
+  };
+
+  // Re-generate current image when font changes
+  useEffect(() => {
+    if (carouselData[currentIndex].text) {
+        generateImage(currentIndex);
+    }
+  }, [selectedFont]);
+
+  const callApiWithRetry = async (payload, endpoint, retries = 3) => {
+    let delay = 1000;
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (response.ok) {
+          return await response.json();
+        }
+
+        let errorMessage = `API Error: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          if (errorData.error && errorData.error.message) errorMessage = errorData.error.message;
+        } catch (e) {}
+
+        if (response.status !== 429 && response.status < 500) throw new Error(errorMessage);
+        throw new Error(errorMessage);
+
+      } catch (e) {
+        if (i === retries - 1) throw e;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2;
+      }
+    }
+  };
+
+  const handleMagicSplit = async () => {
+    if (!longParagraph.trim()) return;
+    setIsSplitting(true);
+    setError(null);
+
+    const systemPrompt = "You are an expert Instagram content strategist. Take the provided paragraph (Thai/English) and split it into logical carousel slides. Determine the best number of slides based on the content length, between 4 to 7 slides maximum. Slide 1 must be Cover (Hook). The last slide must be Outro/CTA. The middle slides are Content. JSON format: { slides: [{ text: 'Headline', subtext: 'Details' }] }. If input is Thai, output MUST be in Thai.";
+    
+    const payload = {
+      contents: [{ parts: [{ text: `Paragraph to split: ${longParagraph}` }] }],
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            slides: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  text: { type: "STRING" },
+                  subtext: { type: "STRING" }
+                },
+                required: ["text", "subtext"]
+              }
+            }
+          }
+        }
+      }
+    };
+
+    try {
+      const result = await callApiWithRetry(
+        payload, 
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`
+      );
+      
+      const parsed = JSON.parse(result.candidates[0].content.parts[0].text);
+      if (parsed.slides && parsed.slides.length > 0) {
+        const slidesFromApi = parsed.slides.slice(0, 7);
+        const newData = slidesFromApi.map((slide, idx) => {
+          let type = 'content';
+          let label = `เนื้อหา ${idx} (Content)`;
+          
+          if (idx === 0) {
+            type = 'cover';
+            label = 'หน้าปก (Cover)';
+          } else if (idx === slidesFromApi.length - 1) {
+            type = 'outro';
+            label = 'สรุป (Outro)';
+          } else {
+            label = `เนื้อหา ${idx} (Content)`;
+          }
+
+          return {
+            id: idx + 1,
+            text: slide.text || "",
+            subtext: slide.subtext || "",
+            imageUrl: null,
+            status: 'pending',
+            label: label,
+            type: type
+          };
+        });
+
+        setCarouselData(newData);
+        setCurrentIndex(0); 
+        setStep('input'); 
+      }
+    } catch (error) {
+      console.error(error);
+      setError(`การแบ่งเนื้อหาล้มเหลว: ${error.message}`);
+    } finally {
+      setIsSplitting(false);
+    }
+  };
+
+  // --- PURE CANVAS RENDERER ---
+  const renderSlideToDataUrl = (slide) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1350;
+    const ctx = canvas.getContext('2d');
+
+    // 1. Background (Deep Maroon #550202)
+    ctx.fillStyle = '#550202';
+    ctx.fillRect(0, 0, 1080, 1350);
+
+    // 2. Global Settings
+    const padding = 100;
+    const accentColor = '#FFFFFF'; // White Lines
+    const textColor = '#a7d8f9';   // Light Blue Text
+    const labelColor = '#FFFFFF';  // White Label
+    const bodyColor = '#FFFFFF';   // White Body Text
+    
+    // UPDATED FONT FAMILY - Dynamic
+    const mainFont = `"${selectedFont}", sans-serif`;
+
+    // Helper: Wrap Text with explicit newline support
+    const wrapText = (text, x, y, maxWidth, lineHeight, isCentered = false) => {
+      if (!text) return y;
+      
+      // Split by manual newlines first
+      const paragraphs = text.split('\n');
+      let currentY = y;
+
+      paragraphs.forEach((paragraph) => {
+        // If empty line (double enter), add space
+        if (!paragraph) {
+            currentY += lineHeight;
+            return;
+        }
+
+        let segments = [];
+        if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+            const segmenter = new Intl.Segmenter('th', { granularity: 'word' });
+            const iterator = segmenter.segment(paragraph);
+            for (const segment of iterator) {
+            segments.push(segment.segment);
+            }
+        } else {
+            segments = paragraph.includes(' ') ? paragraph.split(' ') : paragraph.split('');
+        }
+
+        let line = '';
+        let lines = [];
+
+        for (let n = 0; n < segments.length; n++) {
+            const testLine = line + segments[n];
+            const metrics = ctx.measureText(testLine);
+            const testWidth = metrics.width;
+
+            if (testWidth > maxWidth && n > 0) {
+            lines.push(line);
+            line = segments[n];
+            } else {
+            line = testLine;
+            }
+        }
+        lines.push(line);
+
+        for (let k = 0; k < lines.length; k++) {
+            const lineText = lines[k].trim();
+            if (isCentered) {
+            ctx.fillText(lineText, x, currentY);
+            } else {
+            ctx.fillText(lineText, x, currentY);
+            }
+            currentY += lineHeight;
+        }
+      });
+
+      return currentY;
+    };
+
+    // 3. Draw Layouts based on Reference
+    if (slide.type === 'cover' || slide.type === 'outro') {
+      // --- CENTERED LAYOUT ---
+      ctx.textAlign = 'center';
+      
+      // Top Label
+      ctx.fillStyle = labelColor;
+      ctx.font = `bold 24px ${mainFont}`;
+      ctx.fillText('Club Solopreneur', 540, 150);
+
+      // Main Headline
+      ctx.fillStyle = textColor;
+      ctx.font = `bold 80px ${mainFont}`; 
+      const titleY = 480; 
+      // Handle explicit newlines in title too
+      const nextY = wrapText(slide.text || 'Topic Title', 540, titleY, 800, 100, true);
+
+      // Vertical White Line
+      ctx.beginPath();
+      ctx.moveTo(540, nextY + 30);
+      ctx.lineTo(540, nextY + 100);
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Subtext
+      ctx.fillStyle = bodyColor;
+      ctx.font = `50px ${mainFont}`; 
+      wrapText(slide.subtext || 'Subtitle goes here', 540, nextY + 160, 850, 70, true);
+
+      // Footer Line
+      ctx.beginPath();
+      ctx.moveTo(240, 1200);
+      ctx.lineTo(840, 1200);
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+    } else {
+      // --- CONTENT LAYOUT ---
+      ctx.textAlign = 'left';
+
+      // Top Category Label
+      ctx.fillStyle = labelColor;
+      ctx.font = `bold 22px ${mainFont}`;
+
+      // Headline
+      ctx.fillStyle = textColor;
+      ctx.font = `bold 65px ${mainFont}`; 
+      const headY = 250;
+      const afterHeadY = wrapText(slide.text || 'Headline', padding, headY, 880, 85);
+
+      // White Divider
+      ctx.beginPath();
+      ctx.moveTo(padding, afterHeadY + 40);
+      ctx.lineTo(padding + 100, afterHeadY + 40);
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      // Body Text
+      ctx.fillStyle = bodyColor;
+      ctx.font = `60px ${mainFont}`; 
+      wrapText(slide.subtext || 'Description text...', padding, afterHeadY + 140, 880, 90);
+
+      // Footer
+      ctx.beginPath();
+      ctx.moveTo(padding, 1200);
+      ctx.lineTo(1080 - padding, 1200);
+      ctx.strokeStyle = accentColor;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // Page Number
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `24px ${mainFont}`;
+      ctx.textAlign = 'right';
+      ctx.fillText(slide.id, 1080 - padding, 1180);
+    }
+
+    return canvas.toDataURL('image/png');
+  };
+
+  const generateImage = async (index) => {
+    setIsLoading(true);
+    setError(null);
+    setCurrentIndex(index);
+    
+    // Ensure font is loaded before rendering
+    try {
+      await document.fonts.load(`1em "${selectedFont}"`);
+    } catch (e) {
+      console.warn("Font loading check failed", e);
+    }
+
+    setTimeout(() => {
+      try {
+        const base64Img = renderSlideToDataUrl(carouselData[index]);
+        
+        const newData = [...carouselData];
+        newData[index].imageUrl = base64Img;
+        newData[index].status = 'review';
+        setCarouselData(newData);
+        setStep('review');
+        setIsLoading(false);
+      } catch (err) {
+        setError("Rendering failed");
+        setIsLoading(false);
+      }
+    }, 300);
+  };
+
+  const generateAllImages = async () => {
+    if (!carouselData.some(d => d.text.trim() !== '')) return;
+    setIsGeneratingAll(true);
+    setIsLoading(true);
+    setError(null);
+    setStep('review'); 
+    
+    try {
+      await document.fonts.load(`bold 80px "${selectedFont}"`);
+    } catch (e) {
+      console.warn("Font wait timeout or error", e);
+    }
+
+    const newData = carouselData.map((slide, i) => {
+        if (!slide.text) return slide;
+        const img = renderSlideToDataUrl(slide);
+        return { ...slide, imageUrl: img, status: 'review' };
+    });
+    
+    setCarouselData(newData);
+    setIsGeneratingAll(false);
+    setIsLoading(false);
+  };
+
+  const downloadSlide = (slide) => {
+    if (!slide.imageUrl) return;
+    const link = document.createElement('a');
+    link.download = `ClubSolopreneur-Slide-${slide.id}.png`;
+    link.href = slide.imageUrl;
+    link.click();
+  };
+
+  const downloadAllSlides = () => {
+    carouselData.forEach((slide) => {
+      if (slide.imageUrl) {
+        setTimeout(() => {
+          downloadSlide(slide);
+        }, slide.id * 200);
+      }
+    });
+  };
+
+  const handleNext = () => {
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < carouselData.length) {
+      setCurrentIndex(nextIndex);
+      if (!carouselData[nextIndex].imageUrl) {
+          generateImage(nextIndex);
+      }
+    } else {
+      setStep('summary');
+    }
+  };
+
+  const handlePrev = () => {
+    const prevIndex = currentIndex - 1;
+    if (prevIndex >= 0) {
+      setCurrentIndex(prevIndex);
+      if (!carouselData[prevIndex].imageUrl) {
+          generateImage(prevIndex);
+      }
+    }
+  };
+
+  const handleEdit = () => {
+    setStep('input');
+    setError(null);
+  };
+
+  const handleSidebarClick = (idx) => {
+    if (isGeneratingAll) return;
+    setCurrentIndex(idx);
+    const slide = carouselData[idx];
+    if (!slide.imageUrl) {
+      generateImage(idx);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FDFDFD] text-[#1A1A1A] font-sans selection:bg-[#FF8C00] selection:text-white">
+      {/* Inject Font dynamically based on selection */}
+      <style>
+        {`@import url('https://fonts.googleapis.com/css2?family=${selectedFont.replace(/ /g, '+')}:wght@300;400;500;600;700&display=swap');`}
+      </style>
+
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full z-50 px-8 py-6 flex justify-between items-center border-b border-gray-100 bg-white/80 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-[#1A1A1A] rounded-lg flex items-center justify-center">
+            <Layers className="text-white w-5 h-5" />
+          </div>
+          <span className="font-bold tracking-tight text-xl uppercase">Studio.</span>
+        </div>
+        
+        <div className="flex gap-8 text-sm font-medium">
+          <button onClick={() => { setActiveTab('creator'); setError(null); }} className={`transition-colors ${activeTab === 'creator' ? 'text-[#FF8C00]' : 'text-gray-400 hover:text-black'}`}>ออกแบบ (CREATOR)</button>
+          <button onClick={() => { setActiveTab('history'); setError(null); }} className={`transition-colors ${activeTab === 'history' ? 'text-[#FF8C00]' : 'text-gray-400 hover:text-black'}`}>ประวัติ (HISTORY)</button>
+        </div>
+
+        <button className="bg-[#1A1A1A] text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-black transition-all shadow-sm">
+          อัปเกรด Pro
+        </button>
+      </nav>
+
+      <main className="pt-32 pb-20 px-8 max-w-7xl mx-auto">
+        {activeTab === 'creator' ? (
+          <div className="grid grid-cols-12 gap-8">
+            {/* Left Section: Progress & Bento Inputs */}
+            <div className="col-span-12 lg:col-span-4 space-y-4">
+              
+              {/* Magic Split Section */}
+              <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                <div className="flex justify-between items-center mb-3">
+                  <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Wand2 className="w-5 h-5 text-[#FF8C00]" />
+                    Magic Generator
+                  </h2>
+                  <div className="flex gap-2">
+                     <select 
+                       value={selectedFont} 
+                       onChange={(e) => setSelectedFont(e.target.value)}
+                       className="bg-gray-50 border border-gray-200 text-xs font-bold rounded-lg px-2 py-1 outline-none focus:border-[#FF8C00]"
+                     >
+                        {googleFonts.map(font => (
+                            <option key={font} value={font}>{font}</option>
+                        ))}
+                     </select>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                   <textarea 
+                      className="w-full h-24 bg-gray-50 rounded-xl border-none p-3 text-sm focus:ring-1 focus:ring-[#FF8C00] transition-all resize-none"
+                      placeholder="วางเนื้อหาภาษาไทยที่นี่... (Paste content here)"
+                      value={longParagraph}
+                      onChange={(e) => setLongParagraph(e.target.value)}
+                    />
+                    <button 
+                      disabled={isSplitting || !longParagraph.trim()}
+                      onClick={handleMagicSplit}
+                      className="w-full py-2.5 bg-[#1A1A1A] text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-black disabled:opacity-50 transition-all"
+                    >
+                      {isSplitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+                      ประมวลผล (Process)
+                    </button>
+                </div>
+              </div>
+
+              {/* Slide List */}
+              <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
+                <div className="flex justify-between items-center mb-4">
+                   <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Layout className="w-5 h-5" />
+                    Slides
+                  </h2>
+                </div>
+
+                <div className="space-y-3 h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {carouselData.map((slide, idx) => (
+                      <div 
+                        key={slide.id}
+                        className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                          currentIndex === idx ? 'border-[#FF8C00] bg-orange-50/30' : 'border-gray-100 hover:bg-gray-50'
+                        }`}
+                        onClick={() => handleSidebarClick(idx)}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                              slide.imageUrl ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'
+                            }`}>
+                              {slide.imageUrl ? <Check className="w-4 h-4" /> : slide.id}
+                            </span>
+                            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">{slide.label}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {/* Changed from input to textarea for multiline support */}
+                          <textarea 
+                            placeholder="พาดหัวหลัก... (กด Enter เพื่อขึ้นบรรทัดใหม่)"
+                            className="w-full bg-transparent border-none p-0 focus:ring-0 font-bold placeholder:text-gray-300 resize-none h-auto overflow-hidden"
+                            rows={2}
+                            value={slide.text}
+                            onChange={(e) => updateSlideData(idx, 'text', e.target.value)}
+                          />
+                          <textarea 
+                            placeholder="เนื้อหา... (กด Enter เพื่อขึ้นบรรทัดใหม่)"
+                            className="w-full bg-transparent border-none p-0 focus:ring-0 text-sm text-gray-500 placeholder:text-gray-300 resize-none h-16"
+                            value={slide.subtext}
+                            onChange={(e) => updateSlideData(idx, 'subtext', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {!isGeneratingAll && (
+                    <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-100">
+                      <button 
+                        onClick={() => generateImage(currentIndex)}
+                        disabled={carouselData[currentIndex].text === ""}
+                        className="w-full bg-white border border-[#FF8C00] text-[#FF8C00] py-3 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-orange-50 transition-all disabled:opacity-50 text-sm"
+                      >
+                        ดูตัวอย่างภาพนี้ (Preview Slide)
+                      </button>
+                      <button 
+                        onClick={generateAllImages}
+                        disabled={carouselData.every(d => d.text === "")}
+                        className="w-full bg-[#FF8C00] text-white py-3 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-orange-600 transition-all active:scale-95 shadow-lg shadow-orange-100 disabled:opacity-50 text-sm"
+                      >
+                        สร้างทั้งหมดทีเดียว (Generate All) <Play className="w-4 h-4 fill-current" />
+                      </button>
+                    </div>
+                  )}
+              </div>
+            </div>
+
+            {/* Right Section: Canvas / Preview */}
+            <div className="col-span-12 lg:col-span-8">
+              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm p-10 flex flex-col items-center justify-center min-h-[700px] relative overflow-hidden group bg-dots">
+                
+                {isLoading ? (
+                  <div className="flex flex-col items-center gap-4 animate-in fade-in duration-500">
+                    <Loader2 className="w-12 h-12 text-[#FF8C00] animate-spin" />
+                    <p className="font-bold text-gray-400 uppercase tracking-widest animate-pulse text-center">
+                      {isGeneratingAll ? `กำลังเรนเดอร์ภาพที่ ${currentIndex + 1}...` : `กำลังเรนเดอร์...`}<br/>
+                      <span className="text-[10px] font-normal text-gray-300">Applying {selectedFont}</span>
+                    </p>
+                  </div>
+                ) : step === 'input' && !carouselData[currentIndex].imageUrl ? (
+                  <div className="text-center max-w-md space-y-6">
+                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8">
+                      <ImageIcon className="w-10 h-10 text-gray-300" />
+                    </div>
+                    <h1 className="text-4xl font-bold tracking-tight">ระบบออกแบบอัตโนมัติ</h1>
+                    <p className="text-gray-500 text-lg leading-relaxed">
+                      กรอกข้อความหรือใช้ Magic Split แล้วกดดูตัวอย่าง<br/>
+                      ระบบจะสร้างภาพกราฟิกคุณภาพสูงทันที
+                    </p>
+                  </div>
+                ) : (
+                  <div className="w-full max-w-md animate-in slide-in-from-bottom-8 duration-700">
+                    {/* LIVE PREVIEW */}
+                    <div className="aspect-[4/5] bg-white rounded-xl overflow-hidden shadow-2xl relative mb-8 border border-gray-100 select-none transform transition-transform hover:scale-[1.01]">
+                      {carouselData[currentIndex].imageUrl ? (
+                        <img 
+                          src={carouselData[currentIndex].imageUrl} 
+                          alt="Rendered Slide" 
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-300 gap-4">
+                           <AlertCircle className="w-12 h-12" />
+                           <p className="font-bold">ภาพยังไม่พร้อม</p>
+                           <button 
+                             onClick={() => generateImage(currentIndex)}
+                             className="text-[#FF8C00] underline"
+                           >
+                             สร้างภาพนี้
+                           </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {error && (
+                      <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 text-sm animate-in zoom-in-95">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                        <p className="font-medium">{error}</p>
+                      </div>
+                    )}
+
+                    {!isGeneratingAll && (
+                      <div className="bg-gray-50 p-6 rounded-3xl flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">ภาพที่ {currentIndex + 1} / {carouselData.length}</span>
+                            <span className="font-bold flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${carouselData[currentIndex].imageUrl ? 'bg-green-500' : 'bg-gray-300'}`} />
+                              {carouselData[currentIndex].imageUrl ? 'เสร็จสมบูรณ์' : 'รอการสร้าง'}
+                            </span>
+                          </div>
+
+                          <div className="flex gap-2">
+                            {/* Navigation Controls */}
+                            <button 
+                              onClick={handlePrev}
+                              disabled={currentIndex === 0}
+                              className="p-3 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-30"
+                              title="ย้อนกลับ"
+                            >
+                              <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <button 
+                              onClick={handleNext}
+                              disabled={currentIndex === carouselData.length - 1}
+                              className="p-3 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors disabled:opacity-30"
+                              title="ถัดไป"
+                            >
+                              <ChevronRight className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-3 justify-center border-t border-gray-200 pt-4">
+                          {carouselData[currentIndex].imageUrl && (
+                             <button 
+                                onClick={() => downloadSlide(carouselData[currentIndex])}
+                                className="p-3 rounded-full bg-white border border-gray-200 hover:bg-gray-50 transition-colors"
+                                title="ดาวน์โหลดภาพนี้"
+                              >
+                                <Download className="w-5 h-5" />
+                              </button>
+                          )}
+                          
+                          <button 
+                             onClick={downloadAllSlides}
+                             className="p-3 px-5 rounded-full bg-[#1A1A1A] text-white hover:bg-black transition-colors shadow-lg flex items-center gap-2"
+                             title="ดาวน์โหลดทั้งหมด"
+                          >
+                             <Save className="w-4 h-4" /> <span className="text-sm font-bold">Download All</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Summary / History Tab */
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+            <header className="flex justify-between items-end">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tighter">แกลเลอรี่ผลงาน</h1>
+                <p className="text-gray-500 text-lg md:text-xl">ดาวน์โหลดไฟล์ PNG คุณภาพสูง (1080x1350)</p>
+              </div>
+              <button 
+                onClick={() => setCarouselData(prev => prev.map(d => ({ ...d, imageUrl: null })))}
+                className="flex items-center gap-2 text-red-500 font-bold px-4 py-2 hover:bg-red-50 rounded-xl transition-colors"
+              >
+                <Trash2 className="w-5 h-5" /> ล้างทั้งหมด
+              </button>
+            </header>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {carouselData.map((item, i) => item.imageUrl && (
+                <div key={i} className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden group shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 relative">
+                  <div className="aspect-[4/5] relative overflow-hidden bg-gray-50">
+                    <img src={item.imageUrl} className="w-full h-full object-contain" alt="Slide" />
+                    
+                    {/* DOWNLOAD OVERLAY */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+                      <button 
+                        onClick={() => downloadSlide(item)}
+                        className="bg-white text-black p-4 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center gap-2 font-bold px-6"
+                      >
+                        <Download className="w-5 h-5" /> ดาวน์โหลด
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 bg-gray-50 border-t border-gray-100">
+                    <div className="flex justify-between items-center">
+                       <span className="text-xs font-black tracking-widest text-[#FF8C00] uppercase">ภาพที่ {item.id}</span>
+                       <span className="text-xs text-gray-400">{item.label}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {carouselData.every(d => !d.imageUrl) && (
+                <div className="col-span-full py-32 text-center bg-gray-50 rounded-[3rem] border-2 border-dashed border-gray-200">
+                  <History className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-400 font-bold uppercase tracking-widest">ยังไม่มีประวัติการสร้างงาน</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default App;
