@@ -14,74 +14,95 @@
             background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
             color: #d4af37;
             overflow-x: hidden;
+            min-height: 100vh;
         }
         .wheel-container {
             position: relative;
-            width: 500px;
-            height: 500px;
-            max-width: 90vw;
-            max-height: 90vw;
+            width: 580px;
+            height: 580px;
+            max-width: 95vw;
+            max-height: 95vw;
         }
         #wheelCanvas {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 6px solid #d4af37;
-            box-shadow: 0 0 40px rgba(212, 175, 55, 0.3), inset 0 0 20px rgba(0,0,0,0.8);
+            border: 10px solid #d4af37;
+            box-shadow: 0 0 70px rgba(212, 175, 55, 0.4), inset 0 0 40px rgba(0,0,0,0.9);
             transition: transform 6s cubic-bezier(0.15, 0, 0.15, 1);
+        }
+        /* วงกลมตรงกลางที่ไม่หมุนตาม */
+        .center-stationary {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle, #fff7ad 0%, #d4af37 50%, #b8860b 100%);
+            border-radius: 50%;
+            border: 6px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
             cursor: pointer;
+            user-select: none;
         }
         .pointer {
             position: absolute;
-            top: -15px;
+            top: -30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 45px;
-            height: 55px;
+            width: 60px;
+            height: 70px;
             background: linear-gradient(to bottom, #ffd700, #b8860b);
             clip-path: polygon(50% 100%, 0 0, 100% 0);
-            z-index: 40;
-            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.8));
+            z-index: 60;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.9));
         }
         .luxury-button {
             background: linear-gradient(135deg, #d4af37 0%, #f1c40f 50%, #b8860b 100%);
             color: #000;
             box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+            transition: all 0.3s ease;
         }
         .luxury-button:hover:not(:disabled) {
             background: linear-gradient(135deg, #f1c40f 0%, #ffffff 50%, #d4af37 100%);
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 30px rgba(212, 175, 55, 0.7);
         }
         .winner-modal {
-            background: rgba(0, 0, 0, 0.98);
+            background: rgba(5, 5, 5, 0.99);
             border: 2px solid #d4af37;
-            box-shadow: 0 0 100px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 0 150px rgba(212, 175, 55, 0.5);
         }
         .gold-text {
-            color: #d4af37;
-            background: linear-gradient(to bottom, #fff7ad 0%, #d4af37 100%);
+            background: linear-gradient(to bottom, #fff7ad 0%, #d4af37 50%, #b8860b 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            font-weight: 700;
         }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #111; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 5px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0a0a0a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
         
-        #uploadSection {
-            transition: all 0.5s ease;
+        @keyframes pulse-gold {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
         }
-        .hidden-view {
-            display: none !important;
-        }
+        .animate-pulse-gold { animation: pulse-gold 2s infinite ease-in-out; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center p-4">
+<body class="flex flex-col items-center p-4">
 
-    <!-- Upload Section (หน้าแรก) -->
-    <div id="uploadSection" class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center p-6 text-center">
+    <!-- Setup View -->
+    <div id="uploadSection" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-6 text-center">
         <div class="max-w-xl w-full bg-white/5 border border-[#d4af37]/30 p-10 rounded-[3rem] backdrop-blur-xl">
-            <h2 class="text-4xl font-bold gold-text mb-2">SETUP LUCKY DRAW</h2>
-            <p class="text-gray-400 mb-8 font-light">อัปโหลดไฟล์ Excel (.xlsx) หรือ CSV เพื่อเริ่มต้น</p>
+            <h2 class="text-4xl font-bold gold-text mb-2 tracking-tighter">SETUP LUCKY DRAW</h2>
+            <p class="text-gray-400 mb-8 font-light">รายชื่อ 60 ท่าน เป๊ะตามตารางล่าสุด (พรพรรณ ลำดับ 35)</p>
             
             <div class="mb-6">
                 <label class="block w-full border-2 border-dashed border-[#d4af37]/30 rounded-2xl p-8 hover:bg-[#d4af37]/5 cursor-pointer transition group">
@@ -89,7 +110,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 text-[#d4af37]/50 group-hover:text-[#d4af37] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span id="fileNameDisplay" class="text-[#d4af37]">คลิกเพื่อเลือกไฟล์ XLSX หรือ CSV</span>
+                    <span id="fileNameDisplay" class="text-[#d4af37]">คลิกเพื่อเลือกไฟล์รายชื่อใหม่</span>
                 </label>
             </div>
 
@@ -97,163 +118,152 @@
                 <button id="startWithDataBtn" class="luxury-button py-4 rounded-full font-bold text-lg opacity-50 cursor-not-allowed" disabled>
                     START WITH UPLOADED DATA
                 </button>
-                <button id="useDefaultBtn" class="text-gray-500 hover:text-[#d4af37] text-sm transition mt-2">
-                    หรือใช้รายชื่อเริ่มต้น (60 ท่าน)
+                <button id="useDefaultBtn" class="luxury-button py-4 rounded-full font-bold text-lg text-black">
+                    START WITH 60 PARTICIPANTS
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Main Game View -->
-    <div id="gameView" class="hidden-view w-full flex flex-col items-center">
-        <header class="text-center mt-6 mb-8">
-            <h1 class="text-4xl md:text-6xl font-bold gold-text mb-2 drop-shadow-lg tracking-tighter">LUCKY DRAW</h1>
-            <div class="h-1 w-32 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent mx-auto"></div>
-            <p class="text-gray-400 text-sm mt-3 uppercase tracking-[0.2em] font-light">2025 BDM BDE Recognition Awards</p>
+    <div id="gameView" class="hidden w-full max-w-6xl flex flex-col items-center opacity-0 transition-opacity duration-1000">
+        <header class="text-center mt-6 mb-10">
+            <h1 class="text-5xl md:text-7xl font-bold gold-text mb-2 drop-shadow-lg tracking-tighter">LUCKY DRAW</h1>
+            <div class="h-1 w-48 bg-gradient-to-r from-transparent via-[#d4af37] to-transparent mx-auto"></div>
+            <p class="text-gray-400 text-sm mt-3 uppercase tracking-[0.3em] font-light">2025 BDM BDE Recognition Awards</p>
         </header>
 
-        <div class="flex flex-col lg:flex-row gap-8 items-center justify-center w-full max-w-7xl">
+        <div class="flex flex-col items-center w-full gap-12 px-4">
             <!-- Wheel Section -->
-            <div class="flex-1 flex flex-col items-center">
+            <div class="flex flex-col items-center w-full">
                 <div class="wheel-container">
                     <div class="pointer"></div>
-                    <canvas id="wheelCanvas" width="1000" height="1000" class="w-full h-full"></canvas>
+                    <canvas id="wheelCanvas" width="1200" height="1200"></canvas>
+                    <div id="centerStationary" class="center-stationary">
+                        <span class="text-black font-bold text-2xl tracking-widest">READY</span>
+                    </div>
                 </div>
                 
-                <div class="flex flex-col items-center gap-4 mt-8">
-                    <button id="spinBtn" class="luxury-button text-white font-bold py-4 px-14 rounded-full text-xl transform transition active:scale-95 disabled:opacity-50">
+                <div class="flex flex-col items-center gap-4 mt-12 w-full max-w-md">
+                    <button id="spinBtn" class="luxury-button text-black font-bold py-6 px-24 rounded-full text-4xl transform transition active:scale-95 disabled:opacity-50 disabled:grayscale">
                         SPIN NOW
                     </button>
                     <button id="resetBtn" class="text-gray-600 hover:text-[#d4af37] px-6 py-2 rounded-full text-[10px] uppercase tracking-widest transition">
-                        RESET ALL
+                        RESET ALL (สุ่มใหม่ทั้งหมด)
                     </button>
                 </div>
             </div>
 
-            <!-- Sidebar Panel -->
-            <div class="w-full lg:w-96 flex flex-col gap-4">
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="bg-white/5 border border-[#d4af37]/20 p-3 rounded-xl text-center">
-                        <p class="text-[9px] text-gray-500 uppercase tracking-wider">Remaining</p>
-                        <p id="remainingCount" class="text-2xl font-bold gold-text">0</p>
+            <!-- Dashboard -->
+            <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 pb-20">
+                <div class="flex flex-col gap-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white/5 border border-[#d4af37]/20 p-6 rounded-2xl text-center">
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">REMAINING</p>
+                            <p id="remainingCount" class="text-4xl font-bold gold-text">0</p>
+                        </div>
+                        <div class="bg-white/5 border border-[#d4af37]/20 p-6 rounded-2xl text-center">
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">WINNERS</p>
+                            <p id="winnerCount" class="text-4xl font-bold text-white">0</p>
+                        </div>
                     </div>
-                    <div class="bg-white/5 border border-[#d4af37]/20 p-3 rounded-xl text-center">
-                        <p class="text-[9px] text-gray-500 uppercase tracking-wider">Winners</p>
-                        <p id="winnerCount" class="text-2xl font-bold text-white">0</p>
+                    <div class="bg-[#d4af37]/5 rounded-2xl p-6 border border-[#d4af37]/20 h-[400px] flex flex-col">
+                        <h2 class="text-sm font-semibold mb-4 text-[#d4af37] uppercase tracking-[0.2em] flex items-center gap-2">Hall of Fame</h2>
+                        <div id="historyList" class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3"></div>
                     </div>
                 </div>
 
-                <div class="bg-black/40 backdrop-blur-md rounded-2xl p-5 h-[320px] flex flex-col border border-[#d4af37]/30">
-                    <h2 class="text-sm font-semibold mb-3 border-b border-[#d4af37]/20 pb-2 flex justify-between items-center uppercase tracking-wider">
-                        <span>Participants</span>
-                        <span class="text-[10px] text-gray-500 font-normal">รายชื่อผู้เข้าชิง</span>
+                <div class="lg:col-span-2 bg-black/40 backdrop-blur-md rounded-2xl p-6 flex flex-col border border-[#d4af37]/20 h-[480px]">
+                    <h2 class="text-sm font-semibold mb-4 border-b border-[#d4af37]/10 pb-2 flex justify-between items-center uppercase tracking-wider">
+                        <span>Participants (รายชื่อเป๊ะ 1-60)</span>
+                        <span class="text-[10px] text-gray-500 font-normal" id="listStatus"></span>
                     </h2>
-                    <div id="namesList" class="overflow-y-auto flex-1 space-y-1 pr-2 custom-scrollbar"></div>
-                </div>
-
-                <div class="bg-[#d4af37]/5 rounded-2xl p-4 border border-[#d4af37]/10">
-                    <h2 class="text-[10px] font-semibold mb-2 text-gray-500 uppercase tracking-[0.2em]">Hall of Fame</h2>
-                    <div id="historyList" class="max-h-28 overflow-y-auto text-[11px] space-y-1 custom-scrollbar"></div>
+                    <div id="namesList" class="flex-1 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 md:grid-cols-2 gap-3 content-start"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Winner Modal -->
-    <div id="winnerModal" class="fixed inset-0 z-[110] flex items-center justify-center hidden opacity-0 transition-opacity duration-700 bg-black/95">
-        <div class="winner-modal p-12 rounded-[2.5rem] text-center max-w-2xl w-[90%] transform scale-50 transition-transform duration-500" id="modalContent">
-            <div class="mb-6">
-                <span class="inline-block px-5 py-1.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/40 text-[#d4af37] text-xs uppercase tracking-[0.3em] mb-6 font-semibold">Congratulations</span>
-                <h3 class="text-white text-2xl font-light">ขอแสดงความยินดีกับ</h3>
-            </div>
-            
-            <div class="flex flex-col gap-2 mb-8">
-                <div id="winnerFirstName" class="text-5xl md:text-7xl font-bold gold-text leading-tight drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">ชื่อ</div>
-                <div id="winnerLastName" class="text-4xl md:text-5xl font-semibold text-white/90 leading-tight">นามสกุล</div>
-            </div>
-            
-            <div class="h-px w-1/2 mx-auto bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent my-8"></div>
-            
-            <p class="text-gray-400 text-lg mb-10 tracking-wide" id="winnerDetailDisplay">BDM Code: XXXX | District: XXXX</p>
-            
-            <button id="closeModalBtn" class="luxury-button py-4 px-24 rounded-full font-bold text-xl hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition uppercase tracking-[0.2em]">
-                NEXT
-            </button>
+    <div id="winnerModal" class="fixed inset-0 z-[110] flex items-center justify-center hidden opacity-0 transition-all duration-700 bg-black/95 backdrop-blur-md">
+        <div class="winner-modal p-10 md:p-16 rounded-[3rem] text-center max-w-2xl w-[90%] transform scale-50 transition-transform duration-500" id="modalContent">
+            <span class="inline-block px-6 py-2 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/40 text-[#d4af37] text-sm uppercase tracking-[0.3em] mb-8 font-semibold animate-pulse-gold">CONGRATULATIONS</span>
+            <h3 class="text-white text-3xl font-light mb-4">ขอแสดงความยินดีกับ</h3>
+            <div id="winnerFirstName" class="text-6xl md:text-8xl font-bold gold-text leading-tight drop-shadow-[0_0_25px_rgba(212,175,55,0.5)]"></div>
+            <div id="winnerLastName" class="text-4xl md:text-6xl font-semibold text-white/90 leading-tight mb-8"></div>
+            <div class="h-px w-2/3 mx-auto bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent my-10"></div>
+            <p class="text-gray-400 text-xl tracking-widest font-light mb-2" id="winnerIdDisplay"></p>
+            <p class="text-[#d4af37] text-2xl font-bold mb-12" id="winnerDistrictDisplay"></p>
+            <button id="closeModalBtn" class="luxury-button py-5 px-28 rounded-full font-bold text-2xl uppercase tracking-[0.2em]">NEXT DRAW</button>
         </div>
     </div>
 
     <script>
-        // รายชื่อเริ่มต้นจากไฟล์ 60 ท่าน (ใช้เป็น Default ไม่ตัดใครออก)
+        // รายชื่ออัปเดตใหม่ 60 ท่านเป๊ะๆ ตามตารางล่าสุด
         const DEFAULT_DATA = [
-            { id: "889743", title: "นางสาว", name: "มณีรัตน์", surname: "วัยมาลี", district: "M206" },
-            { id: "200175", title: "นาย", name: "วิริยะพงษ์", surname: "พรมดี", district: "M302" },
-            { id: "553375", title: "นางสาว", name: "ลัดดา", surname: "สุวรรณคล้าย", district: "M105" },
-            { id: "895191", title: "นาย", name: "ดนัย", surname: "ประมล", district: "M101" },
-            { id: "200290", title: "นางสาว", name: "จินตนา", surname: "กิติยา", district: "M204" },
-            { id: "200412", title: "นาย", name: "ปิยะพัทธ์", surname: "ประเวสพิชัย", district: "M306" },
-            { id: "200467", title: "นางสาว", name: "สรัญภร", surname: "ปานอ่อน", district: "M203" },
-            { id: "895195", title: "นางสาว", name: "อารยา", surname: "สุพุทธิไกร", district: "M301" },
-            { id: "895378", title: "นางสาว", name: "กมลชนก", surname: "กุดนาน้อย", district: "M304" },
-            { id: "200364", title: "นางสาว", name: "ประภาพรรณ", surname: "นรารักษ์", district: "M103" },
-            { id: "895161", title: "นางสาว", name: "พรทิพย์", surname: "มิตรธรรมศิริ", district: "M205" },
-            { id: "895345", title: "นางสาว", name: "วิชุดา", surname: "วงษ์แดง", district: "M303" },
-            { id: "895561", title: "นางสาว", name: "ชุติมา", surname: "กาชัย", district: "M206" },
-            { id: "895325", title: "นางสาว", name: "เสาวลักษณ์", surname: "จันทีงาม", district: "M201" },
-            { id: "200407", title: "นาย", name: "พิษณุ", surname: "เพชรกองสวัสดิ์", district: "M304" },
-            { id: "895326", title: "นางสาว", name: "รตา", surname: "ไชยศิลา", district: "M201" },
-            { id: "200344", title: "นาย", name: "อัศวิน", surname: "นารินทร์", district: "M301" },
-            { id: "895531", title: "นางสาว", name: "นันธกานต์", surname: "ศิริเลิศวิจิตร", district: "M104" },
-            { id: "895610", title: "นางสาว", name: "ธนัชพร", surname: "แสงชูชื่น", district: "M305" },
-            { id: "895521", title: "นางสาว", name: "นฤทัย", surname: "จอมนา", district: "M104" },
-            { id: "895543", title: "นางสาว", name: "พรรณปพร", surname: "ธนากิจเลิศวรกุล", district: "M102" },
-            { id: "895503", title: "นางสาว", name: "กัญนิกา", surname: "อินกองสี", district: "M103" },
-            { id: "895551", title: "นางสาว", name: "ณัฐยาพร", surname: "โสนาบุญ", district: "M202" },
-            { id: "895475", title: "นาย", name: "นิวัฒน์", surname: "เกตุสังข์", district: "M301" },
-            { id: "895605", title: "นาย", name: "ธนดล", surname: "รติวิริยะพงศ์", district: "M204" },
-            { id: "895624", title: "นาย", name: "วุฒิชัย", surname: "บุญทอง", district: "M102" },
-            { id: "895484", title: "นางสาว", name: "พัณณ์ชิตา", surname: "บุราณนิธิจิรโชติ", district: "M201" },
-            { id: "895494", title: "นางสาว", name: "จิราวรรณ", surname: "พรหมรักษ์", district: "M201" },
-            { id: "895541", title: "นางสาว", name: "อารียา", surname: "ผลาพร", district: "M205" },
-            { id: "895528", title: "นาย", name: "อธิกสิณ", surname: "ปิ่นแก้ว", district: "M306" },
-            { id: "895180", title: "นางสาว", name: "ธิรารัตน์", surname: "คล้ายประสิทธิ์", district: "M105" },
-            { id: "895506", title: "นางสาว", name: "สิริพร", surname: "นิมมา", district: "M203" },
-            { id: "895076", title: "นางสาว", name: "วลัยรัตน์", surname: "มะหมัดเหม", district: "M101" },
-            { id: "895629", title: "นางสาว", name: "นภาวรรณ", surname: "วงษ์นุ่ม", district: "M105" },
-            { id: "200406", title: "นางสาว", name: "นริศรา", surname: "ธรรมเกตุ", district: "M304" },
-            { id: "895184", title: "นาย", name: "อธิษฐ์", surname: "ชัยศรีวิบูลย์", district: "M305" },
-            { id: "895333", title: "นางสาว", name: "รัชนีกร", surname: "กลิ่นไพบูลย์", district: "M206" },
-            { id: "895216", title: "นางสาว", name: "ณัฐทิชา", surname: "ม่วงงาม", district: "M106" },
-            { id: "895601", title: "นางสาว", name: "พรชนก", surname: "ประยงค์หอม", district: "M303" },
-            { id: "895526", title: "นางสาว", name: "หิรัญญา", surname: "ทรัพย์จันทร์", district: "M202" },
-            { id: "895462", title: "นางสาว", name: "พรพรรณ", surname: "เต็นติรัมย์", district: "M302" },
-            { id: "895350", title: "นางสาว", name: "กานต์ธิดา", surname: "ศิริสากล", district: "P302, P305" },
-            { id: "895609", title: "นางสาว", name: "สุรีย์พร", surname: "ปาระมีทอง", district: "P201, P206" },
-            { id: "895432", title: "นางสาว", name: "ภาวิกา", surname: "ชัยศรี", district: "P103, P104" },
-            { id: "200331", title: "นางสาว", name: "รุ่งนภา", surname: "สุขแสง", district: "P203" },
-            { id: "200416", title: "นางสาว", name: "นันท์นภัส", surname: "สิรสุนทรานนท์", district: "P101" },
-            { id: "895612", title: "นางสาว", name: "นวรัตน์", surname: "บุราณรักษ์", district: "P102" },
-            { id: "895451", title: "นางสาว", name: "เกวลิน", surname: "แก้วแสงรัตน์", district: "P101" },
-            { id: "895431", title: "นางสาว", name: "กนิษฐา", surname: "จงเจริญผลกุล", district: "P105" },
-            { id: "200233", title: "นาย", name: "จิรยุทธ์", surname: "เพ็ชรคงสวัสดิ์", district: "P304" },
-            { id: "895507", title: "นางสาว", name: "วนิดา", surname: "สวัสดิ์วงค์", district: "P204" },
-            { id: "895520", title: "นางสาว", name: "จันทร์ทิพย์", surname: "ส้มปาน", district: "P304" },
-            { id: "895537", title: "นาย", name: "ขจรศักดิ์", surname: "สุวพิชญ์พงศ์", district: "P205" },
-            { id: "895616", title: "นาย", name: "บุญฤทธิ์", surname: "หอประเสริฐยิ่ง", district: "P106" },
-            { id: "895508", title: "นาย", name: "สรวีย์", surname: "ธนพรเจริญพงศ์", district: "P102" },
-            { id: "895470", title: "นาย", name: "ธนาวุฒิ", surname: "เอี้ยงลักขะ", district: "P205" },
-            { id: "895608", title: "นางสาว", name: "วิริยา", surname: "ไชยบุตร", district: "P301" },
-            { id: "895632", title: "นางสาว", name: "ภิรมยา", surname: "สุ่มมาตย์", district: "P202" },
-            { id: "895532", title: "นางสาว", name: "สมกมล", surname: "คงนุกูลกิจ", district: "P201" },
-            { id: "895628", title: "นาย", name: "นิคม", surname: "มั่งศิริ", district: "P301" },
-            { id: "895316", title: "นางสาว", name: "นันทิกา", surname: "เสริฐจันทึก", district: "P303" },
-            { id: "895606", title: "นาย", name: "อัษฎาวุฒิ", surname: "นากสุก", district: "P202" },
-            { id: "895447", title: "นางสาว", name: "พิชามญช์", surname: "ตติยรัตนพาณิชย์", district: "P206" },
-            { id: "895513", title: "นางสาว", name: "กนกพร", surname: "อินกองสี", district: "P105" },
-            { id: "895502", title: "นางสาว", name: "นุชสรา", surname: "แก้วประจุ", district: "P204" },
-            { id: "895111", title: "นางสาว", name: "อุบลลักษณ์", surname: "สาทประสิทธิ์", district: "P303" },
-            { id: "895460", title: "นาย", name: "ธัชวิน", surname: "เลิศเจริญขจรกุล", district: "P103, P104" }
+            { id: "889743", title: "นางสาว", name: "มณีรัตน์", surname: "วัยมาลี", district: "M206" }, // 1
+            { id: "200175", title: "นาย", name: "วิริยะพงษ์", surname: "พรมดี", district: "M302" }, // 2
+            { id: "553375", title: "นางสาว", name: "ลัดดา", surname: "สุวรรณคล้าย", district: "M105" }, // 3
+            { id: "895191", title: "นาย", name: "ดนัย", surname: "ประมล", district: "M101" }, // 4
+            { id: "200290", title: "นางสาว", name: "จินตนา", surname: "กิติยา", district: "M204" }, // 5
+            { id: "200412", title: "นาย", name: "ปิยะพัทธ์", surname: "ประเวสพิชัย", district: "M306" }, // 6
+            { id: "200467", title: "นางสาว", name: "สรัญภร", surname: "ปานอ่อน", district: "M203" }, // 7
+            { id: "895195", title: "นางสาว", name: "อารยา", surname: "สุพุทธิไกร", district: "M301" }, // 8
+            { id: "895378", title: "นางสาว", name: "กมลชนก", surname: "กุดนาน้อย", district: "M304" }, // 9
+            { id: "200364", title: "นางสาว", name: "ประภาพรรณ", surname: "นรารักษ์", district: "M103" }, // 10
+            { id: "895161", title: "นางสาว", name: "พรทิพย์", surname: "มิตรธรรมศิริ", district: "M205" }, // 11
+            { id: "895345", title: "นางสาว", name: "วิชุดา", surname: "วงษ์แดง", district: "M303" }, // 12
+            { id: "895561", title: "นางสาว", name: "ชุติมา", surname: "กาชัย", district: "M206" }, // 13
+            { id: "835755", title: "นาง", name: "อรุณรุ่ง", surname: "สีสด", district: "M302" }, // 14
+            { id: "670004", title: "นางสาว", name: "เยาวลักษณ์", surname: "ส่งต่าย", district: "M201" }, // 15
+            { id: "895492", title: "นางสาว", name: "กวินท์วิชญ์", surname: "จิราธนัศกรณ์", district: "P001/M201" }, // 16
+            { id: "887523", title: "นางสาว", name: "วรรณวิสา", surname: "กุลธำรง", district: "M101" }, // 17
+            { id: "895505", title: "นางสาว", name: "วิภาวรรณ", surname: "หยิบจันทร์", district: "M204" }, // 18
+            { id: "895342", title: "นาย", name: "ฐานาพัฒน์", surname: "เลี้ยงอำนวย", district: "M204" }, // 19
+            { id: "895503", title: "นางสาว", name: "นันท์นภัส", surname: "จริงดี", district: "M205" }, // 20
+            { id: "895421", title: "นางสาว", name: "สุธาวัลย์", surname: "นิตย์วิฬาร์", district: "M201" }, // 21
+            { id: "836031", title: "นางสาว", name: "ลำพู", surname: "สร้อยกล่อม", district: "M203" }, // 22
+            { id: "895056", title: "นางสาว", name: "รัฐชฎา", surname: "ศรีมาราช", district: "M302" }, // 23
+            { id: "895198", title: "นางสาว", name: "ระพีวรรณ", surname: "เกรียงพิทักษ์", district: "M104" }, // 24
+            { id: "200416", title: "นางสาว", name: "ธิรารัตน์", surname: "คล้ายประสิทธิ์", district: "M105" }, // 25
+            { id: "895506", title: "นางสาว", name: "สิริพร", surname: "นิมมา", district: "M203" }, // 26
+            { id: "895076", title: "นางสาว", name: "วลัยรัตน์", surname: "มะหมัดเหม", district: "M101" }, // 27
+            { id: "895629", title: "นางสาว", name: "นภาวรรณ", surname: "วงษ์นุ่ม", district: "M105" }, // 28
+            { id: "200406", title: "นางสาว", name: "นริศรา", surname: "ธรรมเกตุ", district: "M304" }, // 29
+            { id: "895184", title: "นาย", name: "อธิษฐ์", surname: "ชัยศรีวิบูลย์", district: "M305" }, // 30
+            { id: "895333", title: "นางสาว", name: "รัชนีกร", surname: "กลิ่นไพบูลย์", district: "M206" }, // 31
+            { id: "895216", title: "นางสาว", name: "ณัฐทิชา", surname: "ม่วงงาม", district: "M106" }, // 32
+            { id: "895601", title: "นางสาว", name: "พรชนก", surname: "ประยงค์หอม", district: "M303" }, // 33
+            { id: "895526", title: "นางสาว", name: "หิรัญญา", surname: "ทรัพย์จันทร์", district: "M202" }, // 34
+            { id: "895462", title: "นางสาว", name: "พรพรรณ", surname: "เต็นติรัมย์", district: "M302" }, // 35 (Re-added)
+            { id: "895350", title: "นางสาว", name: "กานต์ธิดา", surname: "ศิริสากล", district: "P302, P305" }, // 36
+            { id: "895609", title: "นางสาว", name: "สุรีย์พร", surname: "ปาระมีทอง", district: "P201, P206" }, // 37
+            { id: "895432", title: "นางสาว", name: "ภาวิกา", surname: "ชัยศรี", district: "P103, P104" }, // 38
+            { id: "895351", title: "นางสาว", name: "เอมศรัตน์", surname: "อิ่มเอมรัตนโชค", district: "P401, P402" }, // 39
+            { id: "895320", title: "นางสาว", name: "ปรารถนา", surname: "อินทโชติ", district: "P501, P502" }, // 40
+            { id: "895446", title: "นาย", name: "สมทบ", surname: "ชูผลา", district: "P101, P103" }, // 41
+            { id: "895267", title: "นางสาว", name: "สุชารัตน์", surname: "บัวตอง", district: "P403" }, // 42
+            { id: "895233", title: "นาย", name: "ธาดา", surname: "ไยกุล", district: "P102" }, // 43
+            { id: "895276", title: "นาย", name: "พิเชษฐ์", surname: "อินต๊ะรัตน์", district: "P404" }, // 44
+            { id: "895595", title: "นาย", name: "ณัฏฐชัย", surname: "ฐิรศิริชวเลิศ", district: "P103" }, // 45
+            { id: "895433", title: "นางสาว", name: "ปวีณา", surname: "บริบูรณ์", district: "P206" }, // 46
+            { id: "895613", title: "นางสาว", name: "ศิริกานดา", surname: "ตันวังผาง", district: "P403" }, // 47
+            { id: "895248", title: "นางสาว", name: "วรางค์สิริ", surname: "เกียรติ์วราภัทร", district: "P402" }, // 48
+            { id: "895321", title: "นางสาว", name: "วราภรณ์", surname: "สนามชัย", district: "P504" }, // 49
+            { id: "895263", title: "นางสาว", name: "เพชรรัตน์", surname: "เทียมเมฆา", district: "P404" }, // 50
+            { id: "895680", title: "นาง", name: "สุพรรณษา", surname: "ปัจชามาตย์", district: "P104" }, // 51
+            { id: "895311", title: "นางสาว", name: "วรรณพัชต์", surname: "มณีนพรัศม์", district: "P502" }, // 52
+            { id: "895550", title: "นางสาว", name: "ชัญภัชชญา", surname: "จิรญาณ์กุล", district: "P204" }, // 53
+            { id: "895336", title: "นางสาว", name: "ชนิตา", surname: "นวลอินทร์", district: "P102" }, // 54
+            { id: "895465", title: "นางสาว", name: "เขมิกา", surname: "ทิพย์เพ็ง", district: "P304" }, // 55
+            { id: "895611", title: "นางสาว", name: "ภาวิตรี", surname: "กางทอง", district: "P103" }, // 56
+            { id: "895559", title: "นางสาว", name: "นิตยา", surname: "สร้อยจินดา", district: "P101" }, // 57
+            { id: "895501", title: "นางสาว", name: "ปภัสสร", surname: "คำชนะ", district: "P206" }, // 58
+            { id: "895639", title: "นางสาว", name: "วาสนา", surname: "ปรีหะจินดา", district: "P501" }, // 59
+            { id: "894436", title: "นาย", name: "เอกราช", surname: "ภูมิภัทรนาราดล", district: "Group" } // 60
         ];
 
+        let initialChosenData = [];
         let participants = [];
         let winnersHistory = [];
         let currentRotation = 0;
@@ -266,213 +276,142 @@
 
         const uploadSection = document.getElementById('uploadSection');
         const gameView = document.getElementById('gameView');
-        const fileInput = document.getElementById('fileInput');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-        const startWithDataBtn = document.getElementById('startWithDataBtn');
-        const useDefaultBtn = document.getElementById('useDefaultBtn');
         const spinBtn = document.getElementById('spinBtn');
         const resetBtn = document.getElementById('resetBtn');
         const winnerModal = document.getElementById('winnerModal');
         const modalContent = document.getElementById('modalContent');
-        const closeModalBtn = document.getElementById('closeModalBtn');
+        const centerStationary = document.getElementById('centerStationary');
 
-        // ระบบจัดการไฟล์
-        async function handleFile(file) {
-            fileNameDisplay.textContent = `ไฟล์ที่เลือก: ${file.name}`;
-            const reader = new FileReader();
-            if (file.name.endsWith('.csv')) {
-                reader.onload = (e) => {
-                    initialDataStore = parseCSV(e.target.result);
-                    enableStartButton();
-                };
-                reader.readAsText(file);
-            } else {
-                reader.onload = (e) => {
-                    const workbook = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                    initialDataStore = jsonData.slice(1)
-                        .filter(row => row.length >= 5)
-                        .map(row => ({
-                            id: row[1]?.toString().trim() || "",
-                            title: row[2]?.toString().trim() || "",
-                            name: row[3]?.toString().trim() || "",
-                            surname: row[4]?.toString().trim() || "",
-                            district: row[5]?.toString().trim() || ""
-                        }));
-                    enableStartButton();
-                };
-                reader.readAsArrayBuffer(file);
-            }
-        }
+        function clean(s) { return s ? s.toString().trim() : ""; }
 
-        function parseCSV(text) {
-            const pattern = /"([^"]*(?:""[^"]*)*)"|([^,]+)|(?<=,|^)(?=,|$)/g;
-            const lines = text.split(/\r?\n/);
-            return lines.slice(1).map(line => {
-                const matches = [...line.matchAll(pattern)];
-                const row = matches.map(m => (m[1] !== undefined ? m[1].replace(/""/g, '"') : m[2])?.trim() || "");
-                return { id: row[1], title: row[2], name: row[3], surname: row[4], district: row[5] };
-            }).filter(p => p.name);
-        }
-
-        function enableStartButton() {
-            if (initialDataStore.length > 0) {
-                startWithDataBtn.disabled = false;
-                startWithDataBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        fileInput.addEventListener('change', (e) => {
+        document.getElementById('fileInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) handleFile(file);
+            if (!file) return;
+            document.getElementById('fileNameDisplay').textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const data = new Uint8Array(ev.target.result);
+                const wb = XLSX.read(data, { type: 'array', codepage: 874 });
+                const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+                initialDataStore = json.slice(1).filter(r => r[3]).map((r, i) => ({
+                    rank: clean(r[0]) || (i + 1), id: clean(r[1]), title: clean(r[2]), name: clean(r[3]),
+                    surname: clean(r[4]), district: clean(r[5])
+                }));
+                if (initialDataStore.length > 0) {
+                    const startBtn = document.getElementById('startWithDataBtn');
+                    startBtn.disabled = false;
+                    startBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            };
+            reader.readAsArrayBuffer(file);
         });
 
-        function launchGame(data) {
-            participants = JSON.parse(JSON.stringify(data));
-            uploadSection.classList.add('hidden-view');
-            gameView.classList.remove('hidden-view');
-            updateUI();
-            drawWheel();
+        function launch(data) {
+            initialChosenData = JSON.parse(JSON.stringify(data));
+            participants = data.map((p, i) => ({ ...p, originalOrder: parseInt(p.rank) || (i + 1) }));
+            uploadSection.classList.add('hidden');
+            gameView.classList.remove('hidden');
+            setTimeout(() => gameView.classList.add('opacity-100'), 50);
+            update();
+            draw();
         }
 
-        startWithDataBtn.addEventListener('click', () => launchGame(initialDataStore));
-        useDefaultBtn.addEventListener('click', () => launchGame(DEFAULT_DATA));
+        document.getElementById('startWithDataBtn').onclick = () => launch(initialDataStore);
+        document.getElementById('useDefaultBtn').onclick = () => launch(DEFAULT_DATA);
 
-        // ระบบวงล้อและ UI
-        function updateUI() {
+        // Reset Button Fix
+        resetBtn.onclick = () => {
+            if(confirm('ต้องการล้างประวัติรางวัลและเริ่มสุ่มใหม่จากรายชื่อทั้งหมดใช่หรือไม่?')) {
+                winnersHistory = [];
+                participants = initialChosenData.map((p, i) => ({ ...p, originalOrder: parseInt(p.rank) || (i + 1) }));
+                currentRotation = 0;
+                canvas.style.transition = 'none';
+                canvas.style.transform = 'rotate(0rad)';
+                setTimeout(() => {
+                    canvas.style.transition = 'transform 6s cubic-bezier(0.15, 0, 0.15, 1)';
+                    update();
+                    draw();
+                }, 50);
+            }
+        };
+
+        function update() {
             document.getElementById('remainingCount').innerText = participants.length;
             document.getElementById('winnerCount').innerText = winnersHistory.length;
-
+            document.getElementById('listStatus').innerText = `${participants.length} ท่าน`;
             const list = document.getElementById('namesList');
-            // แสดงชื่อ-นามสกุลเต็มในแถบข้าง
             list.innerHTML = participants.map(p => `
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-[#d4af37]/5">
-                    <div class="text-[8px] text-[#d4af37] opacity-60 w-8 truncate font-mono">${p.district}</div>
-                    <div class="text-[11px] text-gray-300 truncate">
-                        <span class="text-[#d4af37]/70 font-light">${p.title}</span> ${p.name} ${p.surname}
+                <div class="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-[#d4af37]/10 hover:border-[#d4af37]/40 transition group">
+                    <div class="w-10 h-10 rounded-full bg-[#d4af37]/20 flex items-center justify-center text-[12px] font-bold text-[#d4af37] border border-[#d4af37]/20 flex-shrink-0 group-hover:bg-[#d4af37] group-hover:text-black transition">
+                        ${p.originalOrder}
+                    </div>
+                    <div class="text-sm text-gray-300 truncate flex-1 flex flex-col">
+                        <span class="text-[10px] text-gray-500 block uppercase">${p.district}</span>
+                        <div class="truncate">
+                            <span class="text-[#d4af37] font-semibold">${p.title}</span> ${p.name} ${p.surname}
+                        </div>
                     </div>
                 </div>
             `).join('');
-
             const history = document.getElementById('historyList');
-            // แสดงชื่อ-นามสกุลเต็มในประวัติ
-            history.innerHTML = winnersHistory.map((w, index) => `
-                <div class="flex justify-between items-center bg-white/5 p-1.5 rounded mb-1 border-l-2 border-[#d4af37]">
-                    <span class="text-white">${index + 1}. ${w.name} ${w.surname}</span>
-                    <span class="text-[8px] text-gray-600">${w.district}</span>
+            history.innerHTML = winnersHistory.map((w, i) => `
+                <div class="flex justify-between items-center bg-[#d4af37]/10 p-3 rounded-xl border-l-4 border-[#d4af37] shadow-lg">
+                    <div class="flex flex-col"><span class="text-white text-xs font-medium">${w.name} ${w.surname}</span><span class="text-[9px] text-[#d4af37] uppercase">${w.district}</span></div>
+                    <div class="flex items-center gap-2"><span class="text-[10px] text-gray-600">ID ${w.originalOrder}</span><span class="text-[#d4af37] font-bold text-lg">#${winnersHistory.length - i}</span></div>
                 </div>
-            `).join('') || '<p class="text-gray-700 italic text-center py-2">No history</p>';
+            `).join('') || '<p class="text-gray-700 italic text-center py-4 w-full">ยังไม่มีผู้ได้รับรางวัล</p>';
         }
 
-        function drawWheel() {
-            if (participants.length === 0) return;
-            const centerX = canvas.width / 2;
-            const centerY = canvas.height / 2;
-            const radius = 460;
-            const step = (Math.PI * 2) / participants.length;
-
+        function draw() {
+            if (!participants.length) { ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+            const centerX = canvas.width / 2, centerY = canvas.height / 2, radius = 560, step = (Math.PI * 2) / participants.length;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             participants.forEach((p, i) => {
                 const angle = i * step;
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, angle, angle + step);
-                ctx.fillStyle = wheelColors[i % wheelColors.length];
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(212, 175, 55, 0.2)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                ctx.save();
-                ctx.translate(centerX, centerY);
-                ctx.rotate(angle + step / 2);
-                const isDark = (['#000000', '#111111', '#0a0a0a', '#151515'].includes(wheelColors[i % wheelColors.length]));
-                ctx.fillStyle = isDark ? '#d4af37' : '#000';
-                
-                // ในวงล้อแสดง: ชื่อ และอักษรแรกนามสกุล.
-                const pSurnameChar = p.surname ? p.surname.trim().charAt(0) + "." : "";
-                const displayName = p.name + " " + pSurnameChar;
-                
-                ctx.font = 'bold 20px Kanit';
-                ctx.textAlign = 'right';
-                const finalLabel = displayName.length > 15 ? displayName.substring(0,13)+'..' : displayName;
-                ctx.fillText(finalLabel, radius - 50, 10);
-                ctx.restore();
+                ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.arc(centerX, centerY, radius, angle, angle + step);
+                ctx.fillStyle = wheelColors[i % wheelColors.length]; ctx.fill();
+                ctx.strokeStyle = 'rgba(212, 175, 55, 0.4)'; ctx.lineWidth = 1; ctx.stroke();
+                ctx.save(); ctx.translate(centerX, centerY); ctx.rotate(angle + step / 2);
+                ctx.fillStyle = (['#000', '#111', '#0a0', '#151'].includes(wheelColors[i % wheelColors.length])) ? '#d4af37' : '#000';
+                const fontSize = participants.length > 50 ? '26px' : (participants.length > 30 ? '34px' : '44px');
+                ctx.font = `bold ${fontSize} Kanit`; ctx.textAlign = 'right';
+                const displayName = `${p.name} ${p.surname.charAt(0)}.`;
+                ctx.fillText(displayName, radius - 70, 15); ctx.restore();
             });
-
-            // ปุ่ม READY ตรงกลาง
-            const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 80);
-            grad.addColorStop(0, '#fff7ad');
-            grad.addColorStop(0.5, '#d4af37');
-            grad.addColorStop(1, '#b8860b');
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 80, 0, Math.PI * 2);
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            ctx.fillStyle = '#000';
-            ctx.font = 'bold 24px Kanit';
-            ctx.textAlign = 'center';
-            ctx.fillText("READY", centerX, centerY + 8);
         }
 
         function spin() {
-            if (isSpinning || participants.length === 0) return;
-            isSpinning = true;
-            spinBtn.disabled = true;
-            const extraSpins = 8 + Math.random() * 5; 
-            const randomStop = Math.random() * (Math.PI * 2);
-            const totalRotation = extraSpins * Math.PI * 2 + randomStop;
+            if (isSpinning || !participants.length) return;
+            isSpinning = true; spinBtn.disabled = true;
+            const totalRotation = (12 + Math.random() * 8) * Math.PI * 2 + Math.random() * (Math.PI * 2);
             currentRotation += totalRotation;
             canvas.style.transform = `rotate(-${currentRotation}rad)`;
             setTimeout(() => {
-                const normalizedRotation = (3 * Math.PI / 2 + currentRotation) % (Math.PI * 2);
+                const norm = (currentRotation + (Math.PI / 2)) % (Math.PI * 2);
                 const step = (Math.PI * 2) / participants.length;
-                const winnerIndex = Math.floor(normalizedRotation / step);
-                showWinner(participants[winnerIndex] || participants[0], winnerIndex);
-                isSpinning = false;
-                spinBtn.disabled = false;
+                let idx = Math.floor((Math.PI * 2 - norm) / step) % participants.length;
+                if (idx < 0) idx += participants.length;
+                const winner = participants[idx];
+                document.getElementById('winnerFirstName').innerText = winner.title + winner.name;
+                document.getElementById('winnerLastName').innerText = winner.surname;
+                document.getElementById('winnerIdDisplay').innerText = `BDM Code: ${winner.id} | ลำดับที่ ${winner.originalOrder}`;
+                document.getElementById('winnerDistrictDisplay').innerText = `District: ${winner.district}`;
+                confetti({ particleCount: 300, spread: 160, origin: { y: 0.6 }, colors: ['#d4af37', '#fff', '#ffd700'] });
+                winnerModal.classList.remove('hidden');
+                setTimeout(() => { winnerModal.classList.add('opacity-100'); modalContent.classList.replace('scale-50', 'scale-100'); }, 50);
+                winnersHistory.unshift(winner); participants.splice(idx, 1);
+                update(); if (participants.length) draw();
+                isSpinning = false; spinBtn.disabled = false;
             }, 6000);
         }
 
-        function showWinner(winner, index) {
-            document.getElementById('winnerFirstName').innerText = `${winner.title}${winner.name}`;
-            document.getElementById('winnerLastName').innerText = winner.surname;
-            document.getElementById('winnerDetailDisplay').innerText = `BDM Code: ${winner.id} | District: ${winner.district}`;
-            confetti({ particleCount: 200, spread: 120, origin: { y: 0.6 }, colors: ['#d4af37', '#ffffff', '#ffd700'] });
-            winnerModal.classList.remove('hidden');
-            setTimeout(() => {
-                winnerModal.classList.add('opacity-100');
-                modalContent.classList.remove('scale-50');
-                modalContent.classList.add('scale-100');
-            }, 50);
-            winnersHistory.unshift(winner);
-            participants.splice(index, 1);
-            updateUI();
-            if (participants.length > 0) drawWheel();
-        }
-
-        function closeModal() {
-            winnerModal.classList.remove('opacity-100');
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-50');
+        spinBtn.onclick = spin;
+        centerStationary.onclick = spin;
+        document.getElementById('closeModalBtn').onclick = () => {
+            winnerModal.classList.remove('opacity-100'); 
+            modalContent.classList.replace('scale-100', 'scale-50');
             setTimeout(() => winnerModal.classList.add('hidden'), 500);
-        }
-
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) / rect.width * 1000 - 500;
-            const y = (e.clientY - rect.top) / rect.height * 1000 - 500;
-            if (Math.sqrt(x*x + y*y) < 160) spin();
-        });
-
-        spinBtn.addEventListener('click', spin);
-        resetBtn.addEventListener('click', () => location.reload());
-        closeModalBtn.addEventListener('click', closeModal);
+        };
     </script>
 </body>
 </html>
