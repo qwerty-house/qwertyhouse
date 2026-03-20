@@ -77,7 +77,7 @@
 </head>
 <body class="min-h-screen flex flex-col items-center p-4">
 
-    <!-- Upload Section -->
+    <!-- Upload Section (หน้าแรก) -->
     <div id="uploadSection" class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center p-6 text-center">
         <div class="max-w-xl w-full bg-white/5 border border-[#d4af37]/30 p-10 rounded-[3rem] backdrop-blur-xl">
             <h2 class="text-4xl font-bold gold-text mb-2">SETUP LUCKY DRAW</h2>
@@ -98,7 +98,7 @@
                     START WITH UPLOADED DATA
                 </button>
                 <button id="useDefaultBtn" class="text-gray-500 hover:text-[#d4af37] text-sm transition mt-2">
-                    หรือใช้รายชื่อเริ่มต้น (62 ท่าน)
+                    หรือใช้รายชื่อเริ่มต้น (60 ท่าน)
                 </button>
             </div>
         </div>
@@ -174,7 +174,7 @@
             
             <div class="h-px w-1/2 mx-auto bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent my-8"></div>
             
-            <p class="text-gray-500 text-lg mb-10 tracking-wide" id="winnerDetailDisplay">BDM Code: XXXX | District: XXXX</p>
+            <p class="text-gray-400 text-lg mb-10 tracking-wide" id="winnerDetailDisplay">BDM Code: XXXX | District: XXXX</p>
             
             <button id="closeModalBtn" class="luxury-button py-4 px-24 rounded-full font-bold text-xl hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] transition uppercase tracking-[0.2em]">
                 NEXT
@@ -183,13 +183,13 @@
     </div>
 
     <script>
+        // รายชื่อเริ่มต้นจากไฟล์ 60 ท่าน (ใช้เป็น Default ไม่ตัดใครออก)
         const DEFAULT_DATA = [
             { id: "889743", title: "นางสาว", name: "มณีรัตน์", surname: "วัยมาลี", district: "M206" },
             { id: "200175", title: "นาย", name: "วิริยะพงษ์", surname: "พรมดี", district: "M302" },
             { id: "553375", title: "นางสาว", name: "ลัดดา", surname: "สุวรรณคล้าย", district: "M105" },
             { id: "895191", title: "นาย", name: "ดนัย", surname: "ประมล", district: "M101" },
             { id: "200290", title: "นางสาว", name: "จินตนา", surname: "กิติยา", district: "M204" },
-            { id: "200005", title: "นางสาว", name: "พลมณี", surname: "วิชัยโชติยากานต์", district: "M106" },
             { id: "200412", title: "นาย", name: "ปิยะพัทธ์", surname: "ประเวสพิชัย", district: "M306" },
             { id: "200467", title: "นางสาว", name: "สรัญภร", surname: "ปานอ่อน", district: "M203" },
             { id: "895195", title: "นางสาว", name: "อารยา", surname: "สุพุทธิไกร", district: "M301" },
@@ -197,6 +197,11 @@
             { id: "200364", title: "นางสาว", name: "ประภาพรรณ", surname: "นรารักษ์", district: "M103" },
             { id: "895161", title: "นางสาว", name: "พรทิพย์", surname: "มิตรธรรมศิริ", district: "M205" },
             { id: "895345", title: "นางสาว", name: "วิชุดา", surname: "วงษ์แดง", district: "M303" },
+            { id: "895561", title: "นางสาว", name: "ชุติมา", surname: "กาชัย", district: "M206" },
+            { id: "895325", title: "นางสาว", name: "เสาวลักษณ์", surname: "จันทีงาม", district: "M201" },
+            { id: "200407", title: "นาย", name: "พิษณุ", surname: "เพชรกองสวัสดิ์", district: "M304" },
+            { id: "895326", title: "นางสาว", name: "รตา", surname: "ไชยศิลา", district: "M201" },
+            { id: "200344", title: "นาย", name: "อัศวิน", surname: "นารินทร์", district: "M301" },
             { id: "895531", title: "นางสาว", name: "นันธกานต์", surname: "ศิริเลิศวิจิตร", district: "M104" },
             { id: "895610", title: "นางสาว", name: "ธนัชพร", surname: "แสงชูชื่น", district: "M305" },
             { id: "895521", title: "นางสาว", name: "นฤทัย", surname: "จอมนา", district: "M104" },
@@ -210,6 +215,7 @@
             { id: "895494", title: "นางสาว", name: "จิราวรรณ", surname: "พรหมรักษ์", district: "M201" },
             { id: "895541", title: "นางสาว", name: "อารียา", surname: "ผลาพร", district: "M205" },
             { id: "895528", title: "นาย", name: "อธิกสิณ", surname: "ปิ่นแก้ว", district: "M306" },
+            { id: "895180", title: "นางสาว", name: "ธิรารัตน์", surname: "คล้ายประสิทธิ์", district: "M105" },
             { id: "895506", title: "นางสาว", name: "สิริพร", surname: "นิมมา", district: "M203" },
             { id: "895076", title: "นางสาว", name: "วลัยรัตน์", surname: "มะหมัดเหม", district: "M101" },
             { id: "895629", title: "นางสาว", name: "นภาวรรณ", surname: "วงษ์นุ่ม", district: "M105" },
@@ -270,6 +276,7 @@
         const modalContent = document.getElementById('modalContent');
         const closeModalBtn = document.getElementById('closeModalBtn');
 
+        // ระบบจัดการไฟล์
         async function handleFile(file) {
             fileNameDisplay.textContent = `ไฟล์ที่เลือก: ${file.name}`;
             const reader = new FileReader();
@@ -332,12 +339,13 @@
         startWithDataBtn.addEventListener('click', () => launchGame(initialDataStore));
         useDefaultBtn.addEventListener('click', () => launchGame(DEFAULT_DATA));
 
+        // ระบบวงล้อและ UI
         function updateUI() {
             document.getElementById('remainingCount').innerText = participants.length;
             document.getElementById('winnerCount').innerText = winnersHistory.length;
 
             const list = document.getElementById('namesList');
-            // แก้ไข: แสดง ชื่อ นามสกุล เต็ม
+            // แสดงชื่อ-นามสกุลเต็มในแถบข้าง
             list.innerHTML = participants.map(p => `
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-[#d4af37]/5">
                     <div class="text-[8px] text-[#d4af37] opacity-60 w-8 truncate font-mono">${p.district}</div>
@@ -348,7 +356,7 @@
             `).join('');
 
             const history = document.getElementById('historyList');
-            // แก้ไข: แสดง ชื่อ นามสกุล เต็ม
+            // แสดงชื่อ-นามสกุลเต็มในประวัติ
             history.innerHTML = winnersHistory.map((w, index) => `
                 <div class="flex justify-between items-center bg-white/5 p-1.5 rounded mb-1 border-l-2 border-[#d4af37]">
                     <span class="text-white">${index + 1}. ${w.name} ${w.surname}</span>
@@ -383,8 +391,8 @@
                 const isDark = (['#000000', '#111111', '#0a0a0a', '#151515'].includes(wheelColors[i % wheelColors.length]));
                 ctx.fillStyle = isDark ? '#d4af37' : '#000';
                 
-                // แก้ไข: ในวงล้อแสดง ชื่อ และอักษรแรกของนามสกุล.
-                const pSurnameChar = p.surname ? p.surname.charAt(0) + "." : "";
+                // ในวงล้อแสดง: ชื่อ และอักษรแรกนามสกุล.
+                const pSurnameChar = p.surname ? p.surname.trim().charAt(0) + "." : "";
                 const displayName = p.name + " " + pSurnameChar;
                 
                 ctx.font = 'bold 20px Kanit';
@@ -394,7 +402,7 @@
                 ctx.restore();
             });
 
-            // READY Button
+            // ปุ่ม READY ตรงกลาง
             const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 80);
             grad.addColorStop(0, '#fff7ad');
             grad.addColorStop(0.5, '#d4af37');
