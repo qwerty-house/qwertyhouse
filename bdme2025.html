@@ -16,6 +16,7 @@
             overflow-x: hidden;
             min-height: 100vh;
         }
+        /* วงล้อขนาดใหญ่สำหรับ PC */
         .wheel-container {
             position: relative;
             width: 650px;
@@ -31,6 +32,7 @@
             box-shadow: 0 0 80px rgba(212, 175, 55, 0.4), inset 0 0 50px rgba(0,0,0,0.9);
             transition: transform 6s cubic-bezier(0.15, 0, 0.15, 1);
         }
+        /* ศูนย์กลางวงล้อคงที่ */
         .center-stationary {
             position: absolute;
             top: 50%;
@@ -76,6 +78,7 @@
             transform: translateY(-2px) scale(1.02);
             box-shadow: 0 6px 35px rgba(212, 175, 55, 0.6);
         }
+        /* Modal Design */
         .winner-modal, .confirm-modal {
             background: linear-gradient(145deg, rgba(20,20,20,0.99) 0%, rgba(5,5,5,1) 100%);
             border: 2px solid #d4af37;
@@ -106,7 +109,7 @@
     <div id="uploadSection" class="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-6 text-center">
         <div class="max-w-xl w-full bg-white/5 border border-[#d4af37]/30 p-10 rounded-[3rem] backdrop-blur-xl">
             <h2 class="text-4xl font-bold gold-text mb-2 tracking-tighter uppercase">Setup Lucky Draw</h2>
-            <p class="text-gray-400 mb-8 font-light text-lg">เลือกรายชื่อผู้เข้าชิงเพื่อเริ่มการจับรางวัล</p>
+            <p class="text-gray-400 mb-8 font-light text-lg">อัปโหลดไฟล์ หรือเริ่มจากรายชื่อตั้งต้น 60 ท่าน</p>
             
             <div class="mb-6">
                 <label class="block w-full border-2 border-dashed border-[#d4af37]/30 rounded-2xl p-10 hover:bg-[#d4af37]/5 cursor-pointer transition group">
@@ -114,7 +117,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-[#d4af37]/50 group-hover:text-[#d4af37] transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <span id="fileNameDisplay" class="text-[#d4af37] text-lg font-light">อัปโหลดไฟล์ (.xlsx / .csv)</span>
+                    <span id="fileNameDisplay" class="text-[#d4af37] text-lg font-light">คลิกเพื่อเลือกไฟล์รายชื่อ</span>
                 </label>
             </div>
 
@@ -138,6 +141,7 @@
         </header>
 
         <div class="flex flex-col items-center w-full gap-12 px-6">
+            <!-- Wheel Section -->
             <div class="flex flex-col items-center w-full">
                 <div class="wheel-container">
                     <div class="pointer"></div>
@@ -157,6 +161,7 @@
                 </div>
             </div>
 
+            <!-- PC Dashboard -->
             <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-10 pb-24 mt-4">
                 <div class="flex flex-col gap-8">
                     <div class="grid grid-cols-2 gap-6">
@@ -186,17 +191,25 @@
         </div>
     </div>
 
-    <!-- Winner Modal (Landscape PC) -->
+    <!-- Winner Modal (Landscape PC) - No Prefixes, Large Split Rows -->
     <div id="winnerModal" class="fixed inset-0 z-[110] flex items-center justify-center hidden opacity-0 transition-all duration-700 bg-black/98 backdrop-blur-3xl">
-        <div class="winner-modal p-12 md:p-16 rounded-[2.5rem] text-center max-w-[1150px] w-[95%] transform scale-50 transition-transform duration-500" id="modalContent">
+        <div class="winner-modal p-12 md:p-16 rounded-[2.5rem] text-center max-w-[1200px] w-[95%] transform scale-50 transition-transform duration-500" id="modalContent">
+            
             <div class="flex justify-center mb-8">
-                <span class="inline-flex items-center px-12 py-4 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-2xl uppercase tracking-[0.5em] font-semibold animate-pulse-gold">Congratulations</span>
+                <span class="inline-flex items-center px-12 py-4 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#d4af37] text-2xl uppercase tracking-[0.5em] font-semibold animate-pulse-gold">
+                    Congratulations
+                </span>
             </div>
+
             <h3 class="text-white text-3xl font-light mb-10 tracking-widest uppercase">ขอแสดงความยินดีกับผู้ได้รับรางวัล</h3>
+            
+            <!-- Focal Point: Pure Name & Surname (Large Equal Font) -->
             <div class="flex flex-col items-center gap-4 mb-14">
-                <div id="winnerFirstName" class="text-7xl md:text-[9.5rem] font-bold gold-text leading-[0.9] drop-shadow-[0_0_40px_rgba(212,175,55,0.7)] uppercase tracking-tight"></div>
-                <div id="winnerLastName" class="text-7xl md:text-[9.5rem] font-bold text-white leading-[0.9] uppercase tracking-tight"></div>
+                <div id="winnerFirstName" class="text-7xl md:text-[9rem] font-bold gold-text leading-[0.9] drop-shadow-[0_0_40px_rgba(212,175,55,0.7)] uppercase tracking-tight"></div>
+                <div id="winnerLastName" class="text-7xl md:text-[9rem] font-bold text-white leading-[0.9] uppercase tracking-tight"></div>
             </div>
+            
+            <!-- Details Row -->
             <div class="grid grid-cols-2 gap-10 max-w-4xl mx-auto border-t border-[#d4af37]/20 pt-12 mb-16">
                 <div class="text-right border-r border-[#d4af37]/20 pr-12">
                     <p class="text-gray-500 text-sm uppercase tracking-[0.4em] mb-2 font-light">BDM CODE</p>
@@ -207,15 +220,18 @@
                     <p class="text-[#d4af37] text-5xl font-bold tracking-tighter" id="winnerDistrictDisplay"></p>
                 </div>
             </div>
-            <button id="closeModalBtn" class="luxury-button py-8 px-64 rounded-full font-bold text-4xl uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(212,175,55,0.4)]">NEXT DRAW</button>
+            
+            <button id="closeModalBtn" class="luxury-button py-8 px-64 rounded-full font-bold text-4xl uppercase tracking-[0.2em] shadow-[0_0_50px_rgba(212,175,55,0.4)]">
+                NEXT DRAW
+            </button>
         </div>
     </div>
 
-    <!-- Custom Reset Confirmation Modal -->
+    <!-- Custom Reset Confirmation Modal (Stable replacement for confirm()) -->
     <div id="resetConfirmModal" class="fixed inset-0 z-[120] flex items-center justify-center hidden opacity-0 transition-all duration-300 bg-black/90 backdrop-blur-xl">
         <div class="confirm-modal p-12 rounded-[2rem] text-center max-w-lg w-[90%] transform scale-90 transition-transform duration-300">
             <h3 class="text-[#d4af37] text-3xl font-bold mb-4 uppercase tracking-tighter">Reset All?</h3>
-            <p class="text-gray-300 text-xl mb-10 font-light">ต้องการคืนรายชื่อทั้งหมด 60 ท่าน<br>และล้างประวัติรางวัลใช่หรือไม่?</p>
+            <p class="text-gray-300 text-xl mb-10 font-light text-center">ต้องการคืนรายชื่อทั้งหมดกลับมาสุ่มใหม่<br>และล้างประวัติรางวัลใช่หรือไม่?</p>
             <div class="grid grid-cols-2 gap-4">
                 <button id="cancelResetBtn" class="bg-white/10 hover:bg-white/20 text-white py-4 rounded-full font-bold text-lg transition">ยกเลิก</button>
                 <button id="confirmResetBtn" class="luxury-button text-black py-4 rounded-full font-bold text-lg transition">ยืนยัน</button>
@@ -224,6 +240,7 @@
     </div>
 
     <script>
+        // ข้อมูลเริ่มต้น 60 ท่าน
         const DEFAULT_DATA = [
             { id: "889743", title: "นางสาว", name: "มณีรัตน์", surname: "วัยมาลี", district: "M206" },
             { id: "200175", title: "นาย", name: "วิริยะพงษ์", surname: "พรมดี", district: "M302" },
@@ -238,9 +255,9 @@
             { id: "895161", title: "นางสาว", name: "พรทิพย์", surname: "มิตรธรรมศิริ", district: "M205" },
             { id: "895345", title: "นางสาว", name: "วิชุดา", surname: "วงษ์แดง", district: "M303" },
             { id: "895561", title: "นางสาว", name: "ชุติมา", surname: "กาชัย", district: "M206" },
-            { id: "835755", title: "นาง", name: "อรุณรุ่ง", surname: "สีสด", district: "M302" }, // 14
-            { id: "670004", title: "นางสาว", name: "เยาวลักษณ์", surname: "ส่งต่าย", district: "M201" }, // 15
-            { id: "895492", title: "นางสาว", name: "กวินท์วิชญ์", surname: "จิราธนัศกรณ์", district: "P001/M201" }, // 16
+            { id: "835755", title: "นาง", name: "อรุณรุ่ง", surname: "สีสด", district: "M302" },
+            { id: "670004", title: "นางสาว", name: "เยาวลักษณ์", surname: "ส่งต่าย", district: "M201" },
+            { id: "895492", title: "นางสาว", name: "กวินท์วิชญ์", surname: "จิราธนัศกรณ์", district: "P001/M201" },
             { id: "887523", title: "นางสาว", name: "วรรณวิสา", surname: "กุลธำรง", district: "M101" },
             { id: "895505", title: "นางสาว", name: "วิภาวรรณ", surname: "หยิบจันทร์", district: "M204" },
             { id: "895342", title: "นาย", name: "ฐานาพัฒน์", surname: "เลี้ยงอำนวย", district: "M204" },
@@ -259,7 +276,7 @@
             { id: "895216", title: "นางสาว", name: "ณัฐทิชา", surname: "ม่วงงาม", district: "M106" },
             { id: "895601", title: "นางสาว", name: "พรชนก", surname: "ประยงค์หอม", district: "M303" },
             { id: "895526", title: "นางสาว", name: "หิรัญญา", surname: "ทรัพย์จันทร์", district: "M202" },
-            { id: "895462", title: "นางสาว", name: "พรพรรณ", surname: "เต็นติรัมย์", district: "M302" }, // 35
+            { id: "895462", title: "นางสาว", name: "พรพรรณ", surname: "เต็นติรัมย์", district: "M302" },
             { id: "895350", title: "นางสาว", name: "กานต์ธิดา", surname: "ศิริสากล", district: "P302, P305" },
             { id: "895609", title: "นางสาว", name: "สุรีย์พร", surname: "ปาระมีทอง", district: "P201, P206" },
             { id: "895432", title: "นางสาว", name: "ภาวิกา", surname: "ชัยศรี", district: "P103, P104" },
@@ -305,9 +322,11 @@
         const winnerModal = document.getElementById('winnerModal');
         const resetModal = document.getElementById('resetConfirmModal');
         const modalContent = document.getElementById('modalContent');
+        const centerStationary = document.getElementById('centerStationary');
 
         function clean(s) { return s ? s.toString().trim() : ""; }
 
+        // ปรับปรุงการอัปโหลดไฟล์
         document.getElementById('fileInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -332,9 +351,7 @@
 
         function launch(data) {
             initialChosenData = JSON.parse(JSON.stringify(data));
-            participants = JSON.parse(JSON.stringify(initialChosenData)).map((p, i) => ({ ...p, originalOrder: parseInt(p.rank) || (i + 1) }));
-            winnersHistory = [];
-            currentRotation = 0;
+            resetState();
             uploadSection.classList.add('hidden');
             gameView.classList.remove('hidden');
             setTimeout(() => gameView.classList.add('opacity-100'), 50);
@@ -342,10 +359,21 @@
             drawWheel();
         }
 
+        function resetState() {
+            winnersHistory = [];
+            participants = JSON.parse(JSON.stringify(initialChosenData)).map((p, i) => ({ 
+                ...p, originalOrder: parseInt(p.rank) || (i + 1) 
+            }));
+            currentRotation = 0;
+            canvas.style.transition = 'none';
+            canvas.style.transform = 'rotate(0rad)';
+            setTimeout(() => { canvas.style.transition = 'transform 6s cubic-bezier(0.15, 0, 0.15, 1)'; }, 50);
+        }
+
         document.getElementById('startWithDataBtn').onclick = () => launch(initialDataStore);
         document.getElementById('useDefaultBtn').onclick = () => launch(DEFAULT_DATA);
 
-        // --- ระบบ Reset ใหม่ที่เสถียร 100% ---
+        // --- ระบบ Reset ที่เสถียรที่สุด ---
         resetBtn.onclick = () => {
             resetModal.classList.remove('hidden');
             setTimeout(() => { resetModal.classList.add('opacity-100'); resetModal.children[0].classList.remove('scale-90'); }, 10);
@@ -358,25 +386,11 @@
         };
 
         document.getElementById('confirmResetBtn').onclick = () => {
-            // ดำเนินการรีเซ็ตข้อมูล
-            winnersHistory = [];
-            participants = JSON.parse(JSON.stringify(initialChosenData)).map((p, i) => ({ ...p, originalOrder: parseInt(p.rank) || (i + 1) }));
-            currentRotation = 0;
-            
-            // รีเซ็ตภาพวงล้อ
-            canvas.style.transition = 'none';
-            canvas.style.transform = 'rotate(0rad)';
-            
-            // ปิด Modal
+            resetState();
             resetModal.classList.add('hidden');
             resetModal.classList.remove('opacity-100');
-            
-            // อัปเดตการแสดงผล
             updateUI();
             drawWheel();
-            
-            // คืนค่า transition
-            setTimeout(() => { canvas.style.transition = 'transform 6s cubic-bezier(0.15, 0, 0.15, 1)'; }, 50);
         };
 
         function updateUI() {
@@ -390,7 +404,7 @@
                         ${p.originalOrder}
                     </div>
                     <div class="text-base text-gray-300 truncate flex-1 flex flex-col">
-                        <span class="text-[11px] text-gray-500 block uppercase tracking-wider font-light">${p.district}</span>
+                        <span class="text-[11px] text-gray-500 block uppercase font-light tracking-wider">${p.district}</span>
                         <div class="truncate">
                             <span class="text-[#d4af37] font-semibold">${p.title}</span> ${p.name} ${p.surname}
                         </div>
@@ -443,33 +457,38 @@
                 if (idx < 0) idx += participants.length;
                 const winner = participants[idx];
                 
-                document.getElementById('winnerFirstName').innerText = winner.name;
-                document.getElementById('winnerLastName').innerText = winner.surname;
+                // --- ปรับหน้า Congrats ตัด นาย/นางสาว ออก ---
+                // ใช้เฉพาะ winner.name และ winner.surname (ไม่เอา winner.title)
+                document.getElementById('winnerFirstName').innerText = winner.name.replace(/^นาย|^นางสาว|^นาง|^น\.ส\./, "").trim();
+                document.getElementById('winnerLastName').innerText = winner.surname.trim();
+                
                 document.getElementById('winnerIdDisplay').innerText = winner.id;
                 document.getElementById('winnerDistrictDisplay').innerText = winner.district;
                 
-                const count = 600;
+                // Confetti Explosion
+                const count = 700;
                 const defaults = { origin: { y: 0.7 }, zIndex: 999 };
                 function fire(particleRatio, opts) {
                     confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) }));
                 }
-                fire(0.25, { spread: 26, startVelocity: 55 });
+                fire(0.25, { spread: 26, startVelocity: 65 });
                 fire(0.2, { spread: 60 });
                 fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-                fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-                fire(0.1, { spread: 120, startVelocity: 45 });
+                fire(0.1, { spread: 120, startVelocity: 35, decay: 0.92, scalar: 1.2 });
+                fire(0.1, { spread: 120, startVelocity: 55 });
 
                 winnerModal.classList.remove('hidden');
-                setTimeout(() => { winnerModal.classList.add('opacity-100'); modalContent.classList.remove('scale-50'); modalContent.classList.add('scale-100'); }, 50);
+                setTimeout(() => { winnerModal.classList.add('opacity-100'); modalContent.classList.replace('scale-50', 'scale-100'); }, 50);
                 
-                winnersHistory.unshift(winner); participants.splice(idx, 1);
+                winnersHistory.unshift(winner); 
+                participants.splice(idx, 1);
                 updateUI(); if (participants.length) drawWheel();
                 isSpinning = false; spinBtn.disabled = false;
             }, 6000);
         }
 
         spinBtn.onclick = spin;
-        document.getElementById('centerStationary').onclick = spin;
+        centerStationary.onclick = spin;
         document.getElementById('closeModalBtn').onclick = () => {
             winnerModal.classList.remove('opacity-100'); modalContent.classList.replace('scale-100', 'scale-50');
             setTimeout(() => winnerModal.classList.add('hidden'), 500);
