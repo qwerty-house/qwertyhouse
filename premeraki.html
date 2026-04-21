@@ -1,428 +1,533 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  CheckCircle2, 
-  Calendar, 
-  Heart, 
-  Sparkles, 
-  RefreshCw, 
-  Phone, 
-  Stethoscope,
-  Clock,
-  Check,
-  ShoppingBag,
-  Star,
-  Info,
-  ArrowRight
-} from 'lucide-react';
-
-const App = () => {
-  const [step, setStep] = useState(0); 
-  const [answers, setAnswers] = useState({
-    goal: '',
-    regularity: '',
-    medical: [],
-    allergies: [], 
-    allergyType: 'acute',
-    pregnancy: '',
-    birthControl: '',
-    seriousness: 5,
-    contactInfo: { phone: '', timeSlot: '' }
-  });
-
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-  }, []);
-
-  const nextStep = () => setStep(prev => prev + 1);
-  const prevStep = () => setStep(prev => prev - 1);
-  
-  const resetQuiz = () => {
-    setStep(0);
-    setAnswers({
-      goal: '', regularity: '', medical: [], allergies: [],
-      allergyType: 'acute', pregnancy: '', birthControl: '',
-      seriousness: 5, contactInfo: { phone: '', timeSlot: '' }
-    });
-  };
-
-  const handleSelect = (field, value) => {
-    setAnswers(prev => ({ ...prev, [field]: value }));
-    if (!['medical', 'allergies', 'contactInfo'].includes(field)) nextStep();
-  };
-
-  const toggleSelection = (field, value) => {
-    const current = [...answers[field]];
-    if (current.includes(value)) {
-      setAnswers({ ...answers, [field]: current.filter(v => v !== value) });
-    } else {
-      setAnswers({ ...answers, [field]: [...current, value] });
-    }
-  };
-
-  const getResult = () => {
-    const { goal, regularity, medical, pregnancy, birthControl, allergies, allergyType } = answers;
-    const coreSeeds = ['flax', 'pumpkin', 'sesame', 'sunflower'];
-    const hasCoreAllergy = allergies.some(a => coreSeeds.includes(a));
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERAKI - Hormone Assessment</title>
     
-    if (hasCoreAllergy && allergyType === 'acute') return 'ALLERGY_FORBIDDEN';
-    if (pregnancy === 'yes' || medical.includes('cancer') || medical.includes('warfarin')) return 'CONSULT_DOCTOR';
-    if (medical.includes('endo') || medical.includes('cysts') || medical.includes('fibroids')) return 'ENDO_SPECIAL';
-    if (regularity === 'irregular' || goal === 'pcos' || goal === 'weight_loss') return 'PCOS_MOON';
-    if (goal === 'pregnancy') return 'PREP_PREGNANCY';
-    if (birthControl !== 'none') return 'BIRTH_CONTROL_BRIDGE';
-    return 'STANDARD_PMS';
-  };
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  const resultKey = getResult();
+    <style>
+        body { font-family: 'IBM Plex Sans Thai', sans-serif; }
+        /* Custom range slider styling */
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: #A51D24;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(165, 29, 36, 0.2);
+        }
+        .animate-in {
+            animation: fadeIn 0.7s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-  const ResultDisplay = () => {
-    const results = {
-      ALLERGY_FORBIDDEN: {
-        title: "โอบกอดความปลอดภัยก่อนนะคะ ⚠️",
-        description: "แอดมินตรวจเช็กแล้ว พบว่าคุณลูกค้ามีอาการ **แพ้เมล็ดพืชหลักแบบเฉียบพลัน** ซึ่งความปลอดภัยสำคัญที่สุดสำหรับ Meraki ค่ะ",
-        note: "* หากเป็นการแพ้แบบภูมิแฝง อาจพิจารณาทานได้เมื่อค่าการแพ้ลดลง แต่หากแพ้เฉียบพลัน ไม่แนะนำให้ทานเด็ดขาดค่ะ",
-        color: "text-rose-700", bg: "bg-rose-50", hideCTA: true
-      },
-      CONSULT_DOCTOR: {
-        title: "ความปลอดภัยของคุณสำคัญที่สุด 👩‍⚕️",
-        description: "เนื่องจากมีภาวะร่างกายที่ละเอียดอ่อน แอดมินแนะนำให้ **ปรึกษาคุณหมอเจ้าของไข้** ก่อนเริ่มทาน เพื่อความสบายใจสูงสุดนะคะ",
-        cta: "สอบถามข้อมูลนำไปปรึกษาคุณหมอ",
-        color: "text-rose-700", bg: "bg-rose-50", isRedFlag: true
-      },
-      ENDO_SPECIAL: {
-        title: "สูตรพิเศษเพื่อมดลูกที่เบาสบาย 🌸",
-        description: "สำหรับกลุ่ม Endo/Cyst เราเน้นการลดอักเสบและปรับ Estrogen ที่เด่นเกินไปให้สมดุลค่ะ",
-        instruction: "ทานเฉพาะ **ถุง Phase 2 (งา+ทานตะวัน)** ตลอดทั้งรอบ 28 วัน พร้อมงดนมวัวและของทอดเพื่อผลลัพธ์ที่ดีที่สุดค่ะ",
-        package: "Set B (2+2) For Endo Care",
-        image: "images/Set B.jpg",
-        price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set B (2+2) ค่ะ ประเมินแล้วเป็นกลุ่ม Endo/Cyst"
-      },
-      PCOS_MOON: {
-        title: "ปรับจังหวะตามรอบพระจันทร์ 🌙",
-        description: "เราจะใช้จังหวะ **New Moon** เป็นตัวกำหนดให้ฮอร์โมนเริ่มทำงานใหม่ เพื่อให้การตกไข่กลับมาสม่ำเสมอค่ะ",
-        instruction: "เริ่ม Phase 1 ในวัน New Moon 14 วัน และสลับ Phase 2 อีก 14 วัน ต่อเนื่องอย่างน้อย 6 เดือนค่ะ",
-        package: "Set A (1+2) 6-Month Bundle",
-        image: "images/Set A.jpg",
-        teaRecommend: "POPS TEA (ช่วยเรื่องเผาผลาญ/PCOS)",
-        price: "1,790.-", perDay: "59",
-        bestValue: true,
-        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่ม PCOS/ลดน้ำหนักยาก"
-      },
-      PREP_PREGNANCY: {
-        title: "เตรียมบ้านที่อุ่นและสมบูรณ์ที่สุด 👶🏻",
-        description: "เน้นบำรุงคุณภาพไข่และผนังมดลูกให้นุ่มอุ่น พร้อมสำหรับการฝังตัวของเบบี๋ค่ะ",
-        instruction: "ทานสลับ Phase 1&2 อย่างละ 14 วัน เริ่มวันแรกที่ประจำเดือนมา เพื่อสารอาหารที่จำเป็นต่อการเตรียมตั้งครรภ์ค่ะ",
-        package: "Set A (1+2) Prep Pregnancy",
-        image: "images/Set A.jpg",
-        teaRecommend: "HER TEA (สมดุลฮอร์โมน/บำรุงเลือด)",
-        teaImage: "images/hertea.jpg",
-        teaPrice: "790.-", price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วเตรียมพร้อมมีเบบี๋"
-      },
-      BIRTH_CONTROL_BRIDGE: {
-        title: "สะพานเชื่อมสู่ฮอร์โมนธรรมชาติ 🌿",
-        description: "ในช่วงเปลี่ยนผ่านจากรับมาเป็นสร้างฮอร์โมนเอง ร่างกายต้องการเวลาขับฮอร์โมนสังเคราะห์ ฟื้นฟู และเสริมสารอาหารอย่างเต็มที่ค่ะ",
-        instruction: "ทานควบคู่ยาคุมได้ทันที และทานต่อเนื่องหลังหยุดยาเพื่อประคองสมดุลไม่ให้ฮอร์โมนเหวี่ยงค่ะ",
-        package: "Set A (1+2) Monthly Balance",
-        image: "images/Set A.jpg",
-        teaRecommend: "HER TEA (ปรับสมดุลหลังหยุดยา)",
-        teaImage: "images/hertea.jpg",
-        teaPrice: "790.-", price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่มใช้ยาคุม/หยุดยา"
-      },
-      STANDARD_PMS: {
-        title: "ให้ทุกเดือนเป็นวันที่สดใส ✨",
-        description: "บอกลางอแง สิวบุก และอารมณ์เหวี่ยง... ให้ธรรมชาติช่วยประคองฮอร์โมนให้นิ่งสงบนะคะ",
-        instruction: "ทานสลับ Phase 1&2 ตามรอบเดือนปกติ ทานต่อเนื่อง 3 เดือนเพื่อผลลัพธ์ที่ยั่งยืนค่ะ",
-        package: "Set A (1+2) Monthly Balance",
-        image: "images/Set A.jpg",
-        teaRecommend: "HER TEA (สูตรสมดุลทุกวัน)",
-        teaImage: "images/hertea.jpg",
-        teaPrice: "790.-", price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set A (1+2) ค่ะ อยากลดอาการ PMS ทั่วไป"
-      }
-    };
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Lucide Icon Component Wrapper
+        const Icon = ({ name, ...props }) => {
+            const IconComponent = lucide[name];
+            return IconComponent ? <IconComponent {...props} /> : null;
+        };
 
-    const res = results[resultKey];
+        const App = () => {
+            const [step, setStep] = useState(0); 
+            const [answers, setAnswers] = useState({
+                goal: '',
+                regularity: '',
+                medical: [],
+                allergies: [], 
+                allergyType: 'acute',
+                pregnancy: '',
+                birthControl: '',
+                seriousness: 5,
+                contactInfo: { phone: '', timeSlot: '' }
+            });
 
-    const formatText = (text) => {
-      if (!text) return "";
-      const parts = text.split(/(\*\*.*?\*\*|<u>.*?<\/u>)/);
-      return parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-bold text-[#A51D24]">{part.slice(2, -2)}</strong>;
-        if (part.startsWith('<u>') && part.endsWith('</u>')) return <u key={i} className="underline decoration-red-200 underline-offset-4">{part.slice(3, -4)}</u>;
-        return part;
-      });
-    };
+            const nextStep = () => setStep(prev => prev + 1);
+            const prevStep = () => setStep(prev => prev - 1);
+            
+            const resetQuiz = () => {
+                setStep(0);
+                setAnswers({
+                    goal: '',
+                    regularity: '',
+                    medical: [],
+                    allergies: [],
+                    allergyType: 'acute',
+                    pregnancy: '',
+                    birthControl: '',
+                    seriousness: 5,
+                    contactInfo: { phone: '', timeSlot: '' }
+                });
+            };
 
-    return (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ fontFamily: '"IBM Plex Sans Thai", sans-serif' }}>
-        <div className={`p-7 rounded-[2.5rem] ${res.bg || 'bg-[#FDFBF7]'} border border-red-100 shadow-sm relative overflow-hidden`}>
-          <div className="flex justify-between items-start mb-6">
-              <h2 className={`text-2xl font-bold ${res.color || 'text-[#A51D24]'} leading-tight`}>{res.title}</h2>
-              <Sparkles className="w-6 h-6 text-[#A51D24]" />
-          </div>
-          <p className="text-gray-600 mb-8 leading-relaxed font-light italic text-sm">{formatText(res.description)}</p>
+            const handleSelect = (field, value) => {
+                setAnswers(prev => ({ ...prev, [field]: value }));
+                if (!['medical', 'allergies', 'contactInfo'].includes(field)) nextStep();
+            };
 
-          <div className="space-y-5">
-            {res.instruction && (
-              <div className="bg-white/60 p-5 rounded-3xl border border-red-50">
-                <h3 className="font-bold text-[#A51D24] mb-2 flex items-center gap-2 text-xs uppercase tracking-wider"><Calendar className="w-4 h-4" /> วิธีการทานที่แนะนำ</h3>
-                <p className="text-sm text-gray-700 leading-relaxed font-medium">{formatText(res.instruction)}</p>
-              </div>
-            )}
+            const toggleSelection = (field, value) => {
+                const current = [...answers[field]];
+                if (current.includes(value)) {
+                    setAnswers({ ...answers, [field]: current.filter(v => v !== value) });
+                } else {
+                    setAnswers({ ...answers, [field]: [...current, value] });
+                }
+            };
 
-            {!res.hideCTA && !res.isRedFlag && (
-              <div className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-red-50 flex flex-col gap-4">
-                <div className="w-full h-48 bg-white rounded-[2rem] overflow-hidden relative flex items-center justify-center">
-                  <img 
-                    src={res.image} 
-                    alt={res.package} 
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.parentElement.innerHTML = `<div class="text-gray-300 text-[10px] text-center p-4">ไม่พบรูปภาพในโฟลเดอร์ images/</div>`;
-                    }}
-                  />
-                </div>
-                <div className="px-2 pb-2">
-                  <h4 className="font-bold text-gray-800 text-base">{res.package}</h4>
-                  <div className="flex items-baseline justify-between mt-3">
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-2xl font-black text-[#A51D24]">{res.price}</span>
-                      <span className="text-[10px] text-gray-400">/ รอบ</span>
+            const getResult = () => {
+                const { goal, regularity, medical, pregnancy, birthControl, allergies, allergyType } = answers;
+                const coreSeeds = ['flax', 'pumpkin', 'sesame', 'sunflower'];
+                const hasCoreAllergy = allergies.some(a => coreSeeds.includes(a));
+                
+                if (hasCoreAllergy && allergyType === 'acute') return 'ALLERGY_FORBIDDEN';
+                if (pregnancy === 'yes' || medical.includes('cancer') || medical.includes('warfarin')) return 'CONSULT_DOCTOR';
+                if (medical.includes('endo') || medical.includes('cysts') || medical.includes('fibroids')) return 'ENDO_SPECIAL';
+                if (regularity === 'irregular' || goal === 'pcos' || goal === 'weight_loss') return 'PCOS_MOON';
+                if (goal === 'pregnancy') return 'PREP_PREGNANCY';
+                if (birthControl !== 'none') return 'BIRTH_CONTROL_BRIDGE';
+                return 'STANDARD_PMS';
+            };
+
+            const resultKey = getResult();
+
+            const ResultDisplay = () => {
+                const results = {
+                    ALLERGY_FORBIDDEN: {
+                        title: "โอบกอดความปลอดภัยก่อนนะคะ ⚠️",
+                        description: "แอดมินตรวจเช็กแล้ว พบว่าคุณลูกค้ามีอาการ **แพ้เมล็ดพืชหลักแบบเฉียบพลัน** ซึ่งความปลอดภัยสำคัญที่สุดสำหรับ Meraki ค่ะ",
+                        note: "* หากเป็นการแพ้แบบภูมิแฝง อาจพิจารณาทานได้เมื่อค่าการแพ้ลดลง แต่หากแพ้เฉียบพลัน <u>ไม่แนะนำให้ทานเด็ดขาด</u> ค่ะ",
+                        color: "text-rose-700",
+                        bg: "bg-rose-50",
+                        hideCTA: true
+                    },
+                    CONSULT_DOCTOR: {
+                        title: "ความปลอดภัยของคุณสำคัญที่สุด 👩‍⚕️",
+                        description: "เนื่องจากมีภาวะร่างกายที่ละเอียดอ่อน แอดมินแนะนำให้ **ปรึกษาคุณหมอเจ้าของไข้** ก่อนเริ่มทาน เพื่อความสบายใจสูงสุดนะคะ",
+                        cta: "สอบถามข้อมูลนำไปปรึกษาคุณหมอ",
+                        color: "text-rose-700",
+                        bg: "bg-rose-50",
+                        isRedFlag: true
+                    },
+                    ENDO_SPECIAL: {
+                        title: "สูตรพิเศษเพื่อมดลูกที่เบาสบาย 🌸",
+                        description: "สำหรับกลุ่ม Endo/Cyst เราเน้นการลดอักเสบและปรับ Estrogen ที่เด่นเกินไปให้สมดุลค่ะ",
+                        instruction: "ทานเฉพาะ **ถุง Phase 2 (งา+ทานตะวัน)** ตลอดทั้งรอบ 28 วัน พร้อมงดนมวัวและของทอดเพื่อผลลัพธ์ที่ดีที่สุดค่ะ",
+                        package: "Set B (2+2) For Endo Care",
+                        image: "Set B.jpg",
+                        price: "1,790.-",
+                        perDay: "64",
+                        copyMsg: "สนใจ Set B (2+2) ค่ะ ประเมินแล้วเป็นกลุ่ม Endo/Cyst"
+                    },
+                    PCOS_MOON: {
+                        title: "ปรับจังหวะตามรอบพระจันทร์ 🌙",
+                        description: "เราจะใช้จังหวะ **New Moon** เป็นตัวกำหนดให้ฮอร์โมนเริ่มทำงานใหม่ เพื่อให้การตกไข่กลับมาสม่ำเสมอค่ะ",
+                        instruction: "เริ่ม Phase 1 ในวัน New Moon 14 วัน และสลับ Phase 2 อีก 14 วัน ต่อเนื่องอย่างน้อย 6 เดือนค่ะ",
+                        package: "Set A (1+2) 6-Month Bundle",
+                        image: "Set A.jpg",
+                        teaRecommend: "POPS TEA (ช่วยเรื่องเผาผลาญ/PCOS)",
+                        price: "1,790.-",
+                        perDay: "59",
+                        bestValue: true,
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่ม PCOS/ลดน้ำหนักยาก"
+                    },
+                    PREP_PREGNANCY: {
+                        title: "เตรียมบ้านที่อุ่นและสมบูรณ์ที่สุด 👶🏻",
+                        description: "เน้นบำรุงคุณภาพไข่และผนังมดลูกให้นุ่มอุ่น พร้อมสำหรับการฝังตัวของเบบี๋ค่ะ",
+                        instruction: "ทานสลับ Phase 1&2 อย่างละ 14 วัน เริ่มวันแรกที่ประจำเดือนมา เพื่อสารอาหารที่จำเป็นต่อการเตรียมตั้งครรภ์ค่ะ",
+                        package: "Set A (1+2) Prep Pregnancy",
+                        image: "Set A.jpg",
+                        teaRecommend: "HER TEA (สมดุลฮอร์โมน/บำรุงเลือด)",
+                        teaImage: "hertea.jpg",
+                        teaPrice: "790.-",
+                        price: "1,790.-",
+                        perDay: "64",
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วเตรียมพร้อมมีเบบี๋"
+                    },
+                    BIRTH_CONTROL_BRIDGE: {
+                        title: "สะพานเชื่อมสู่ฮอร์โมนธรรมชาติ 🌿",
+                        description: "ในช่วงเปลี่ยนผ่านจากรับมาเป็นสร้างฮอร์โมนเอง ร่างกายต้องการเวลาขับฮอร์โมนสังเคราะห์ ฟื้นฟู และเสริมสารอาหารอย่างเต็มที่ การทาน 3 เดือนขึ้นไป จะเห็นผลลัพธ์ที่ชัดเจนค่ะ",
+                        instruction: "ทานควบคู่ยาคุมได้ทันที และทานต่อเนื่องหลังหยุดยาเพื่อประคองสมดุลไม่ให้ฮอร์โมนเหวี่ยงค่ะ",
+                        package: "Set A (1+2) Monthly Balance",
+                        image: "Set A.jpg",
+                        teaRecommend: "HER TEA (ปรับสมดุลหลังหยุดยา)",
+                        teaImage: "hertea.jpg",
+                        teaPrice: "790.-",
+                        price: "1,790.-",
+                        perDay: "64",
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่มใช้ยาคุม/หยุดยา"
+                    },
+                    STANDARD_PMS: {
+                        title: "ให้ทุกเดือนเป็นวันที่สดใส ✨",
+                        description: "บอกลางอแง สิวบุก และอารมณ์เหวี่ยง... ให้ธรรมชาติช่วยประคองฮอร์โมนให้นิ่งสงบนะคะ",
+                        instruction: "ทานสลับ Phase 1&2 ตามรอบเดือนปกติ ทานต่อเนื่อง 3 เดือนเพื่อผลลัพธ์ที่ยั่งยืนค่ะ",
+                        package: "Set A (1+2) Monthly Balance",
+                        image: "Set A.jpg",
+                        teaRecommend: "HER TEA (สูตรสมดุลทุกวัน)",
+                        teaImage: "hertea.jpg",
+                        teaPrice: "790.-",
+                        price: "1,790.-",
+                        perDay: "64",
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ อยากลดอาการ PMS ทั่วไป"
+                    }
+                };
+
+                const res = results[resultKey];
+
+                const formatText = (text) => {
+                    if (!text) return "";
+                    const parts = text.split(/(\*\*.*?\*\*|<u>.*?<\/u>)/);
+                    return parts.map((part, i) => {
+                        if (part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-bold text-[#A51D24]">{part.slice(2, -2)}</strong>;
+                        if (part.startsWith('<u>') && part.endsWith('</u>')) return <u key={i} className="underline decoration-red-200 underline-offset-4">{part.slice(3, -4)}</u>;
+                        return part;
+                    });
+                };
+
+                return (
+                    <div className="space-y-8 animate-in" style={{ fontFamily: '"IBM Plex Sans Thai", sans-serif' }}>
+                        <div className={`p-7 rounded-[2.5rem] ${res.bg || 'bg-[#FDFBF7]'} border border-red-100 shadow-sm relative overflow-hidden`}>
+                            <div className="flex justify-between items-start mb-6">
+                                <h2 className={`text-2xl font-bold ${res.color || 'text-[#A51D24]'} leading-tight`}>{res.title}</h2>
+                                <Icon name="Sparkles" className="w-6 h-6 text-[#A51D24]" />
+                            </div>
+                            <p className="text-gray-600 mb-8 leading-relaxed font-light italic text-sm">{formatText(res.description)}</p>
+
+                            <div className="space-y-5">
+                                {res.instruction && (
+                                    <div className="bg-white/60 p-5 rounded-3xl border border-red-50">
+                                        <h3 className="font-bold text-[#A51D24] mb-2 flex items-center gap-2 text-xs uppercase tracking-wider"><Icon name="Calendar" className="w-4 h-4" /> วิธีการทานที่แนะนำ</h3>
+                                        <p className="text-sm text-gray-700 leading-relaxed font-medium">{formatText(res.instruction)}</p>
+                                    </div>
+                                )}
+
+                                {!res.hideCTA && !res.isRedFlag && (
+                                    <div className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-red-50 flex flex-col gap-4">
+                                        <div className="w-full h-48 bg-white rounded-[2rem] overflow-hidden border border-red-50 relative flex items-center justify-center">
+                                            <img 
+                                                src={res.image} 
+                                                alt={res.package} 
+                                                className="w-full h-full object-contain"
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.parentElement.innerHTML = `<div class="text-center p-4 bg-gray-50 w-full h-full flex flex-col items-center justify-center text-xs text-gray-400 font-medium">Image: ${res.image}</div>`;
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="px-2 pb-2">
+                                            <h4 className="font-bold text-gray-800 text-base">{res.package}</h4>
+                                            <p className="text-xs text-gray-400 mt-1">แนะนำโดยผู้เชี่ยวชาญ Meraki</p>
+                                            <div className="flex items-baseline justify-between mt-3">
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className="text-2xl font-black text-[#A51D24]">{res.price}</span>
+                                                    <span className="text-[10px] text-gray-400">/ รอบ</span>
+                                                </div>
+                                                <div className="bg-red-50 px-3 py-1 rounded-full">
+                                                    <span className="text-[11px] font-bold text-[#A51D24]">เฉลี่ยเพียง {res.perDay}.- / วัน</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {res.teaRecommend && (
+                                    <div className="bg-[#FFF5F1] rounded-[2.5rem] p-4 border border-orange-100 flex items-center gap-4">
+                                        <div className="w-20 h-20 bg-white rounded-2xl overflow-hidden shrink-0 border border-orange-50 shadow-sm flex items-center justify-center">
+                                            <img 
+                                                src={res.teaImage || "hertea.jpg"} 
+                                                alt={res.teaRecommend} 
+                                                className="w-full h-full object-contain" 
+                                                onError={(e) => {
+                                                    e.target.style.display = 'none';
+                                                    e.target.parentElement.innerHTML = `<div class="text-orange-200 font-bold text-[8px] text-center p-1 bg-orange-50 w-full h-full flex items-center justify-center"></div>`;
+                                                }}
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-[9px] text-orange-500 font-bold uppercase tracking-widest">Add-on (Hernest)</p>
+                                            <h4 className="font-bold text-gray-800 text-sm">{res.teaRecommend}</h4>
+                                            <p className="text-sm font-bold text-orange-600 mt-0.5">ราคา {res.teaPrice || "790.-"}</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {!res.hideCTA && !res.isRedFlag && (
+                                <>
+                                    <button 
+                                        onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('สวัสดีค่ะ ผลประเมินคือ: ' + res.copyMsg)}`)}
+                                        className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-2xl flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-95 text-lg"
+                                    >
+                                        รับเซตแนะนำ (ดูแลพิเศษ) 🌟
+                                    </button>
+                                    <button 
+                                        onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ขอรับเซตทดลอง 1 รอบก่อนค่ะ')}`)}
+                                        className="w-full bg-white border-2 border-red-500 text-[#A51D24] font-bold py-5 rounded-full active:scale-95 flex items-center justify-center"
+                                    >
+                                        ขอเลือก "เซตเริ่มต้น" 1 รอบก่อนค่ะ
+                                    </button>
+                                </>
+                            )}
+
+                            {answers.seriousness >= 8 && answers.contactInfo.phone && (
+                                <div className="p-6 bg-green-50 rounded-[2.5rem] border border-green-100 text-center space-y-2">
+                                    <p className="text-[10px] text-green-600 font-bold uppercase tracking-widest">VIP Consultation Slot</p>
+                                    <p className="text-sm font-bold text-green-800">แอดมินรับทราบค่ะ!<br/>เราจะติดต่อกลับคุณที่เบอร์ {answers.contactInfo.phone} ในช่วงวัน{answers.contactInfo.timeSlot} นี้นะคะ</p>
+                                </div>
+                            )}
+
+                            {(res.isRedFlag || !res.hideCTA) && (
+                                <div className="p-6 bg-white border border-gray-100 rounded-[2.5rem] text-center">
+                                    <div className="w-12 h-12 bg-gray-50 rounded-full mx-auto flex items-center justify-center mb-3">
+                                        <Icon name="Stethoscope" className="w-6 h-6 text-gray-400" />
+                                    </div>
+                                    <h4 className="text-sm font-bold text-gray-700">คำแนะนำทางการแพทย์</h4>
+                                    <p className="text-[11px] text-gray-400 mt-1 italic">หากคุณมีโรคประจำตัวร้ายแรง หรือต้องการความมั่นใจสูงสุด แนะนำให้นำข้อมูลส่วนประกอบเมล็ดพืชไปปรึกษาแพทย์ผู้เชี่ยวชาญนะคะ</p>
+                                    {res.isRedFlag && (
+                                        <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ต้องการข้อมูลสารอาหารไปปรึกษาคุณหมอค่ะ')}`)} className="mt-4 px-6 py-2 bg-gray-800 text-white rounded-full text-xs font-bold">คุยกับแอดมิน</button>
+                                    )}
+                                </div>
+                            )}
+
+                            <div className="text-center pt-4">
+                                <div className="px-8 space-y-2 opacity-60">
+                                    <p className="text-[9px] text-gray-400 leading-relaxed">
+                                        *ข้อความเหล่านี้ยังไม่ได้รับการประเมินโดยสำนักงานคณะกรรมการอาหารและยา ผลิตภัณฑ์นี้ไม่ได้มีวัตถุประสงค์เพื่อวินิจฉัย บำบัด รักษา หรือป้องกันโรคใดๆ
+                                    </p>
+                                    <p className="text-[8px] text-gray-400 leading-relaxed font-light">
+                                        "This statement has not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease."
+                                    </p>
+                                </div>
+                                <button onClick={resetQuiz} className="mt-8 text-gray-300 text-[10px] uppercase tracking-widest font-bold flex items-center gap-2 mx-auto hover:text-red-300 transition-colors"><Icon name="RefreshCw" className="w-3 h-3" /> เริ่มประเมินใหม่</button>
+                            </div>
+                        </div>
                     </div>
-                    <div className="bg-red-50 px-3 py-1 rounded-full">
-                      <span className="text-[11px] font-bold text-[#A51D24]">เฉลี่ยเพียง {res.perDay}.- / วัน</span>
+                );
+            };
+
+            return (
+                <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center p-6 text-[#2D2D2D] selection:bg-red-100">
+                    <div className="w-full max-w-md mt-6 mb-12 text-center animate-in">
+                        <h1 className="text-4xl font-light text-[#A51D24] tracking-[0.15em] mb-1 uppercase">MERAKI</h1>
+                        <p className="text-red-300 text-[10px] uppercase tracking-[0.3em] font-bold">Nature is the best medicine</p>
                     </div>
-                  </div>
+
+                    <div className="w-full max-w-md bg-white rounded-[3.5rem] shadow-2xl shadow-red-900/5 overflow-hidden border border-red-50/50">
+                        
+                        {step > 0 && step < 8 && (
+                            <div className="px-12 pt-10 flex justify-between items-center animate-in">
+                                <div className="flex gap-2">
+                                    {[1, 2, 3, 4, 5, 6].map((s) => (
+                                        <div key={s} className={`h-1.5 w-6 rounded-full transition-all duration-700 ${step >= s ? 'bg-[#A51D24]' : 'bg-red-50'}`}></div>
+                                    ))}
+                                </div>
+                                <span className="text-[10px] font-bold text-red-200 uppercase tracking-widest">Step {step}/7</span>
+                            </div>
+                        )}
+
+                        <div className="p-10">
+                            {step === 0 && (
+                                <div className="text-center space-y-10 animate-in">
+                                    <div className="relative inline-block">
+                                        <div className="w-28 h-28 bg-red-50 rounded-full mx-auto flex items-center justify-center">
+                                            <Icon name="Heart" className="w-12 h-12 text-[#A51D24] fill-[#A51D24]/10" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <h2 className="text-4xl font-bold text-gray-800 leading-tight">สวัสดีค่ะ<br/><span className="text-[#A51D24]">คนเก่ง</span></h2>
+                                        <p className="text-gray-500 font-medium text-base leading-relaxed px-4">แอดมินชวนมาทำแบบประเมินสุขภาพฮอร์โมน เพื่อเลือกสิ่งที่ดีที่สุดให้ร่างกายกันค่ะ</p>
+                                    </div>
+                                    <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl flex items-center justify-center group text-lg active:scale-95">เริ่มต้นดูแลตัวเอง <Icon name="ChevronRight" className="ml-2 group-hover:translate-x-1 transition-transform" /></button>
+                                </div>
+                            )}
+
+                            {step === 1 && (
+                                <div className="space-y-8 animate-in">
+                                    <h2 className="text-2xl font-bold text-gray-800 leading-tight">ปัญหาที่คุณกังวล หรือ<br/><span className="text-[#A51D24]">เป้าหมายที่ต้องการจัดการ</span></h2>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {[
+                                            { id: 'pms', label: 'ปวดท้องเมนส์ / สิวฮอร์โมน / อารมณ์แปรปรวน' },
+                                            { id: 'pcos', label: 'PCOS / ประจำเดือนมาไม่ปกติ' },
+                                            { id: 'weight_loss', label: 'ปัญหาลดน้ำหนักยาก / บวมน้ำ' },
+                                            { id: 'pregnancy', label: 'เตรียมพร้อมมีเบบี๋ / บำรุงไข่' },
+                                            { id: 'menopause', label: 'วัยทอง / ร้อนวูบวาบ / นอนไม่หลับ' },
+                                            { id: 'general', label: 'ดูแลสุขภาพและปรับสมดุลทั่วไป' }
+                                        ].map(opt => (
+                                            <button key={opt.id} onClick={() => handleSelect('goal', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7]/50 hover:border-red-300 transition-all text-sm font-medium hover:shadow-lg active:scale-95 flex items-center justify-between group">
+                                                <span>{opt.label}</span> <Icon name="ChevronRight" className="w-4 h-4 text-red-100 group-hover:text-[#A51D24]" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 2 && (
+                                <div className="space-y-8 animate-in">
+                                    <h2 className="text-2xl font-bold text-gray-800 leading-tight">วงจรรอบเดือนของท่าน<br/><span className="text-[#A51D24]">เป็นอย่างไรคะ?</span></h2>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {[{ id: 'regular', label: 'มาสม่ำเสมอ จับรอบวันได้ปกติ' }, { id: 'irregular', label: 'มาไม่ปกติ ขาดหาย จับจังหวะไม่ได้' }, { id: 'none', label: 'เข้าสู่วัยหมดประจำเดือน' }].map(opt => (
+                                            <button key={opt.id} onClick={() => handleSelect('regularity', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7]/50 hover:border-red-300 transition-all text-sm font-medium active:scale-95 flex items-center justify-between group">
+                                                <span>{opt.label}</span> <Icon name="ChevronRight" className="w-4 h-4 text-red-100 group-hover:text-[#A51D24]" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button onClick={prevStep} className="text-gray-400 text-xs font-bold flex items-center gap-2"><Icon name="ChevronLeft" className="w-3 h-3" /> Back</button>
+                                </div>
+                            )}
+
+                            {step === 3 && (
+                                <div className="space-y-8 animate-in">
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-gray-800 leading-tight">ประวัติสุขภาพที่สำคัญ</h2>
+                                        <p className="text-gray-500 text-base mt-2 font-medium">กรุณาระบุภาวะสุขภาพ (เลือกกี่ข้อก็ได้ค่ะ)</p>
+                                    </div>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {[{ id: 'endo', label: 'เยื่อบุมดลูกเจริญผิดที่' }, { id: 'cysts', label: 'ช็อกโกแลตซีสต์' }, { id: 'fibroids', label: 'เนื้องอกในมดลูก' }, { id: 'cancer', label: 'มะเร็งที่ไวต่อฮอร์โมน' }, { id: 'warfarin', label: 'ทานยาละลายลิ่มเลือด' }, { id: 'none', label: 'ไม่มีภาวะข้างต้น' }].map(opt => (
+                                            <button key={opt.id} onClick={() => opt.id === 'none' ? (setAnswers({...answers, medical: ['none']}), nextStep()) : toggleSelection('medical', opt.id)}
+                                                className={`text-left p-5 rounded-3xl border transition-all flex justify-between items-center text-sm font-medium ${answers.medical.includes(opt.id) ? 'border-[#A51D24] bg-red-50 text-[#A51D24]' : 'border-red-50 bg-[#FDFBF7]/50'}`}>
+                                                {opt.label} {answers.medical.includes(opt.id) && <Icon name="CheckCircle2" className="w-5 h-5" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <button onClick={prevStep} className="flex-1 text-gray-400 text-xs font-bold">Back</button>
+                                        <button onClick={nextStep} disabled={answers.medical.length === 0} className={`flex-1 py-5 rounded-full font-bold shadow-lg ${answers.medical.length > 0 ? 'bg-[#A51D24] text-white' : 'bg-gray-100 text-gray-300'}`}>Confirm</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 4 && (
+                                <div className="space-y-8 animate-in">
+                                    <h2 className="text-2xl font-bold text-gray-800 leading-tight">ประวัติการแพ้เมล็ดพืช</h2>
+                                    <div className="space-y-5">
+                                        <div className="p-6 bg-[#FDFBF7] rounded-[2.5rem] border border-red-50">
+                                            <p className="text-xs text-[#A51D24] mb-5 font-bold uppercase tracking-wider">ระบุอาการแพ้เมล็ดพืชหลัก</p>
+                                            <div className="grid grid-cols-1 gap-2">
+                                            {[
+                                                { id: 'flax', label: 'แพ้เมล็ดแฟลกซ์ (Flax)' }, { id: 'pumpkin', label: 'แพ้เมล็ดฟักทอง (Pumpkin)' },
+                                                { id: 'sesame', label: 'แพ้เมล็ดงา (Sesame)' }, { id: 'sunflower', label: 'แพ้เมล็ดทานตะวัน (Sunflower)' },
+                                                { id: 'other_nuts', label: 'แพ้ถั่วอื่นๆ (อัลมอนด์, เม็ดมะม่วงฯ)' }, { id: 'none', label: 'ไม่มีประวัติแพ้ค่ะ' }
+                                            ].map(opt => (
+                                                <button key={opt.id} onClick={() => opt.id === 'none' ? setAnswers({...answers, allergies: ['none']}) : toggleSelection('allergies', opt.id)}
+                                                    className={`text-left p-4 rounded-2xl border transition-all flex justify-between items-center text-[13px] font-medium ${answers.allergies.includes(opt.id) ? 'border-[#A51D24] bg-white text-[#A51D24]' : 'border-red-50 bg-white/50'}`}>
+                                                    {opt.label} {answers.allergies.includes(opt.id) && <Icon name="CheckCircle2" className="w-4 h-4" />}
+                                                </button>
+                                            ))}
+                                            </div>
+                                        </div>
+
+                                        {answers.allergies.length > 0 && !answers.allergies.includes('none') && (
+                                            <div className="p-6 bg-[#FFF5F1] rounded-[2.5rem] border border-orange-100 text-center">
+                                                <p className="text-[10px] text-orange-500 font-bold mb-3 uppercase tracking-widest">ประเภทการแพ้ของคุณ</p>
+                                                <div className="flex gap-2">
+                                                    <button onClick={() => setAnswers({...answers, allergyType: 'acute'})} className={`flex-1 py-3 rounded-full text-xs font-bold border transition-all ${answers.allergyType === 'acute' ? 'bg-orange-500 text-white' : 'bg-white text-orange-400 border-orange-100'}`}>แพ้เฉียบพลัน</button>
+                                                    <button onClick={() => setAnswers({...answers, allergyType: 'latent'})} className={`flex-1 py-3 rounded-full text-xs font-bold border transition-all ${answers.allergyType === 'latent' ? 'bg-orange-500 text-white' : 'bg-white text-orange-400 border-orange-100'}`}>แพ้แบบภูมิแฝง</button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="p-6 bg-[#FDFBF7] rounded-[2.5rem] border border-red-50">
+                                            <p className="font-bold mb-4 text-[11px] uppercase text-gray-500 text-center">กำลังตั้งครรภ์ หรือให้นมบุตร?</p>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <button onClick={() => setAnswers({...answers, pregnancy: 'yes'})} className={`py-4 rounded-full border text-sm font-bold ${answers.pregnancy === 'yes' ? 'bg-[#A51D24] text-white' : 'bg-white text-gray-400'}`}>ใช่ค่ะ</button>
+                                                <button onClick={() => setAnswers({...answers, pregnancy: 'no'})} className={`py-4 rounded-full border text-sm font-bold ${answers.pregnancy === 'no' ? 'bg-[#A51D24] text-white' : 'bg-white text-gray-400'}`}>ไม่ใช่ค่ะ</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <button onClick={prevStep} className="flex-1 text-gray-400 text-xs font-bold">Back</button>
+                                        <button onClick={nextStep} disabled={answers.allergies.length === 0 || !answers.pregnancy} className={`flex-1 py-5 rounded-full font-bold shadow-xl ${answers.allergies.length > 0 && answers.pregnancy ? 'bg-[#A51D24] text-white' : 'bg-gray-100 text-gray-300'}`}>Confirm</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {step === 5 && (
+                                <div className="space-y-8 animate-in">
+                                    <h2 className="text-2xl font-bold text-gray-800 leading-tight">การใช้ยาคุมกำเนิด</h2>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {[ { id: 'pill', label: 'ทานยาคุม / ฉีด / ฝัง / ใส่ห่วง' }, { id: 'stop_soon', label: 'มีแพลนจะหยุดยาคุมเร็วๆ นี้' }, { id: 'none', label: 'ไม่ได้ใช้ยาคุมฮอร์โมนค่ะ' } ].map(opt => (
+                                            <button key={opt.id} onClick={() => handleSelect('birthControl', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7]/50 hover:border-red-300 transition-all text-sm font-medium hover:shadow-lg flex items-center justify-between group">
+                                                <span>{opt.label}</span> <Icon name="ChevronRight" className="w-4 h-4 text-red-100 group-hover:text-[#A51D24]" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <button onClick={prevStep} className="text-gray-400 text-xs font-bold flex items-center gap-2"><Icon name="ChevronLeft" className="w-3 h-3" /> Back</button>
+                                </div>
+                            )}
+
+                            {step === 6 && (
+                                <div className="space-y-8 animate-in text-center">
+                                    <h2 className="text-2xl font-bold text-gray-800 leading-tight">คุณจริงจังกับการจัดการ<br/><span className="text-[#A51D24]">ปัญหานี้แค่ไหนคะ?</span></h2>
+                                    <div className="py-10">
+                                        <input type="range" min="1" max="10" step="1" value={answers.seriousness} onChange={(e) => setAnswers({...answers, seriousness: parseInt(e.target.value)})}
+                                            className="w-full h-2 bg-red-50 rounded-lg appearance-none cursor-pointer accent-[#A51D24]" />
+                                        <div className="flex justify-between mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest px-2"><span>1 - สบายๆ</span><span>10 - ต้องดีขึ้นเดี๋ยวนี้</span></div>
+                                        <div className="mt-10 text-6xl font-black text-[#A51D24] opacity-20">{answers.seriousness}</div>
+                                    </div>
+                                    <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl">ถัดไป</button>
+                                </div>
+                            )}
+
+                            {step === 7 && (
+                                <div className="space-y-8 animate-in">
+                                    {answers.seriousness >= 8 ? (
+                                        <>
+                                            <div className="text-center">
+                                                <div className="w-16 h-16 bg-red-50 rounded-full mx-auto flex items-center justify-center mb-4"><Icon name="Phone" className="w-8 h-8 text-[#A51D24]" /></div>
+                                                <h2 className="text-2xl font-bold text-gray-800 leading-tight">ต้องการรับคำปรึกษา<br/><span className="text-[#A51D24]">ทางโทรศัพท์ฟรี (5-10 นาที)?</span></h2>
+                                                <p className="text-xs text-gray-400 mt-2">สำหรับลูกค้าที่จริงจัง แอดมินยินดีดูแลแบบ Exclusive ค่ะ</p>
+                                            </div>
+                                            <div className="space-y-4">
+                                                <input type="tel" placeholder="กรอกเบอร์โทรศัพท์ของคุณ" value={answers.contactInfo.phone} 
+                                                    onChange={(e) => setAnswers({...answers, contactInfo: {...answers.contactInfo, phone: e.target.value}})}
+                                                    className="w-full p-6 rounded-3xl bg-[#FDFBF7] border border-red-50 focus:border-red-300 outline-none text-center font-bold" />
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    {['อังคาร (10:00-11:00)', 'เสาร์ (10:00-11:00)'].map(slot => (
+                                                        <button key={slot} onClick={() => setAnswers({...answers, contactInfo: {...answers.contactInfo, timeSlot: slot}})}
+                                                            className={`p-4 rounded-2xl text-[11px] font-bold border transition-all ${answers.contactInfo.timeSlot === slot ? 'bg-[#A51D24] text-white' : 'bg-white text-gray-400'}`}>{slot}</button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center space-y-4">
+                                            <div className="w-20 h-20 bg-red-50 rounded-full mx-auto flex items-center justify-center"><Icon name="CheckCircle2" className="w-10 h-10 text-[#A51D24]" /></div>
+                                            <h2 className="text-2xl font-bold text-gray-800">ขอบคุณสำหรับข้อมูลค่ะ</h2>
+                                            <p className="text-gray-500 text-sm">เราพร้อมแล้วที่จะสรุปผลลัพธ์ที่เหมาะสมที่สุดให้คุณ</p>
+                                        </div>
+                                    )}
+                                    <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl">ดูผลการประเมิน</button>
+                                </div>
+                            )}
+
+                            {step === 8 && <ResultDisplay />}
+                        </div>
+                    </div>
                 </div>
-              </div>
-            )}
+            );
+        };
 
-            {res.teaRecommend && (
-              <div className="bg-[#FFF5F1] rounded-[2.5rem] p-4 border border-orange-100 flex items-center gap-4">
-                <div className="w-20 h-20 bg-white rounded-2xl overflow-hidden shrink-0 border border-orange-50 shadow-sm flex items-center justify-center">
-                  <img 
-                    src={res.teaImage || "images/hertea.jpg"} 
-                    alt={res.teaRecommend} 
-                    className="w-full h-full object-contain" 
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[9px] text-orange-500 font-bold uppercase tracking-widest">Add-on (Hernest)</p>
-                  <h4 className="font-bold text-gray-800 text-sm">{res.teaRecommend}</h4>
-                  <p className="text-sm font-bold text-orange-600 mt-0.5">ราคา {res.teaPrice || "790.-"}</p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {!res.hideCTA && !res.isRedFlag && (
-            <>
-              <button 
-                onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('สวัสดีค่ะ ผลประเมินคือ: ' + res.copyMsg)}`)}
-                className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-2xl flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-95 text-lg"
-              >
-                รับเซตแนะนำ (ดูแลพิเศษ) 🌟
-              </button>
-              <button 
-                onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ขอรับเซตทดลอง 1 รอบก่อนค่ะ')}`)}
-                className="w-full bg-white border-2 border-red-500 text-[#A51D24] font-bold py-5 rounded-full active:scale-95 flex items-center justify-center"
-              >
-                ขอเลือก "เซตเริ่มต้น" 1 รอบก่อนค่ะ
-              </button>
-            </>
-          )}
-
-          {answers.seriousness >= 8 && answers.contactInfo.phone && (
-            <div className="p-6 bg-green-50 rounded-[2.5rem] border border-green-100 text-center">
-               <p className="text-sm font-bold text-green-800">แอดมินรับทราบค่ะ! เราจะติดต่อกลับที่เบอร์ {answers.contactInfo.phone}</p>
-            </div>
-          )}
-
-          {(res.isRedFlag || !res.hideCTA) && (
-            <div className="p-6 bg-white border border-gray-100 rounded-[2.5rem] text-center">
-               <Stethoscope className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-               <h4 className="text-sm font-bold text-gray-700">คำแนะนำทางการแพทย์</h4>
-               <p className="text-[11px] text-gray-400 mt-1 italic">หากท่านมีโรคประจำตัวร้ายแรง แนะนำให้ปรึกษาแพทย์ก่อนทานนะคะ</p>
-               {res.isRedFlag && (
-                 <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ต้องการข้อมูลสารอาหารไปปรึกษาคุณหมอค่ะ')}`)} className="mt-4 px-6 py-2 bg-gray-800 text-white rounded-full text-xs font-bold">คุยกับแอดมิน</button>
-               )}
-            </div>
-          )}
-
-          <div className="text-center pt-4">
-             <button onClick={resetQuiz} className="mt-8 text-gray-300 text-[10px] uppercase tracking-widest font-bold flex items-center gap-2 mx-auto hover:text-red-300 transition-colors"><RefreshCw className="w-3 h-3" /> เริ่มประเมินใหม่</button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="min-h-screen bg-[#FDFBF7] flex flex-col items-center p-6 text-[#2D2D2D]" style={{ fontFamily: '"IBM Plex Sans Thai", sans-serif' }}>
-      <div className="w-full max-w-md mt-6 mb-12 text-center animate-in fade-in duration-1000">
-        <h1 className="text-4xl font-light text-[#A51D24] tracking-[0.15em] mb-1 uppercase">MERAKI</h1>
-        <p className="text-red-300 text-[10px] uppercase tracking-[0.3em] font-bold">Nature is the best medicine</p>
-      </div>
-
-      <div className="w-full max-w-md bg-white rounded-[3.5rem] shadow-2xl overflow-hidden border border-red-50">
-        {step > 0 && step < 8 && (
-          <div className="px-12 pt-10 flex justify-between items-center">
-            <div className="flex gap-2">
-              {[1, 2, 3, 4, 5, 6, 7].map((s) => (
-                <div key={s} className={`h-1.5 w-5 rounded-full transition-all duration-700 ${step >= s ? 'bg-[#A51D24]' : 'bg-red-50'}`}></div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="p-10">
-          {step === 0 && (
-            <div className="text-center space-y-10 animate-in fade-in">
-              <Heart className="w-16 h-16 text-[#A51D24] mx-auto opacity-20" />
-              <div className="space-y-4">
-                <h2 className="text-4xl font-bold text-gray-800 leading-tight">สวัสดีค่ะ<br/><span className="text-[#A51D24]">คนเก่ง</span></h2>
-                <p className="text-gray-500 font-medium text-base">แอดมินชวนมาทำแบบประเมินสุขภาพกันค่ะ</p>
-              </div>
-              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl flex items-center justify-center group text-lg active:scale-95">เริ่มต้นดูแลตัวเอง <ChevronRight className="ml-2" /></button>
-            </div>
-          )}
-
-          {step === 1 && (
-            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
-              <h2 className="text-2xl font-bold text-gray-800 leading-tight">เป้าหมายที่ต้องการจัดการ</h2>
-              <div className="grid grid-cols-1 gap-3">
-                {[
-                  { id: 'pms', label: 'ปวดท้องเมนส์ / สิวฮอร์โมน' },
-                  { id: 'pcos', label: 'PCOS / ประจำเดือนมาไม่ปกติ' },
-                  { id: 'weight_loss', label: 'ลดน้ำหนักยาก / บวมน้ำ' },
-                  { id: 'pregnancy', label: 'เตรียมพร้อมมีเบบี๋ / บำรุงไข่' },
-                  { id: 'menopause', label: 'วัยทอง / นอนไม่หลับ' },
-                  { id: 'general', label: 'ปรับสมดุลทั่วไป' }
-                ].map(opt => (
-                  <button key={opt.id} onClick={() => handleSelect('goal', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] hover:border-red-300 transition-all text-sm font-medium active:scale-95 flex items-center justify-between">
-                    <span>{opt.label}</span> <ChevronRight className="w-4 h-4" />
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
-              <h2 className="text-2xl font-bold text-gray-800">วงจรรรอบเดือนของท่าน</h2>
-              <div className="grid grid-cols-1 gap-3">
-                {[{ id: 'regular', label: 'มาสม่ำเสมอ' }, { id: 'irregular', label: 'มาไม่ปกติ / ขาดหาย' }, { id: 'none', label: 'เข้าสู่วัยหมดประจำเดือน' }].map(opt => (
-                  <button key={opt.id} onClick={() => handleSelect('regularity', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm font-medium flex items-center justify-between">
-                    <span>{opt.label}</span> <ChevronRight className="w-4 h-4" />
-                  </button>
-                ))}
-              </div>
-              <button onClick={prevStep} className="text-gray-400 text-xs font-bold flex items-center gap-2"><ChevronLeft className="w-3 h-3" /> Back</button>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
-              <h2 className="text-2xl font-bold text-gray-800">ประวัติสุขภาพที่สำคัญ</h2>
-              <div className="grid grid-cols-1 gap-2">
-                {[{ id: 'endo', label: 'เยื่อบุมดลูกเจริญผิดที่ / ซีสต์' }, { id: 'fibroids', label: 'เนื้องอกในมดลูก' }, { id: 'cancer', label: 'มะเร็งที่ไวต่อฮอร์โมน' }, { id: 'warfarin', label: 'ทานยาละลายลิ่มเลือด' }, { id: 'none', label: 'ไม่มีภาวะข้างต้น' }].map(opt => (
-                  <button key={opt.id} onClick={() => opt.id === 'none' ? (setAnswers({...answers, medical: ['none']}), nextStep()) : toggleSelection('medical', opt.id)}
-                    className={`text-left p-5 rounded-3xl border transition-all flex justify-between items-center text-sm ${answers.medical.includes(opt.id) ? 'border-[#A51D24] bg-red-50 text-[#A51D24]' : 'border-red-50'}`}>
-                    {opt.label} {answers.medical.includes(opt.id) && <CheckCircle2 className="w-5 h-5" />}
-                  </button>
-                ))}
-              </div>
-              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-5 rounded-full font-bold">ยืนยันและถัดไป</button>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
-              <h2 className="text-2xl font-bold text-gray-800">ประวัติการแพ้เมล็ดพืช</h2>
-              <div className="grid grid-cols-1 gap-2">
-                {[{ id: 'flax', label: 'แพ้เมล็ดแฟลกซ์ / ฟักทอง' }, { id: 'sesame', label: 'แพ้งา / ทานตะวัน' }, { id: 'none', label: 'ไม่มีประวัติแพ้ค่ะ' }].map(opt => (
-                  <button key={opt.id} onClick={() => opt.id === 'none' ? setAnswers({...answers, allergies: ['none']}) : toggleSelection('allergies', opt.id)}
-                    className={`text-left p-4 rounded-2xl border text-sm ${answers.allergies.includes(opt.id) ? 'border-[#A51D24] bg-red-50' : 'border-red-50'}`}>
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-              <div className="p-6 bg-[#FDFBF7] rounded-[2.5rem] border border-red-50">
-                <p className="font-bold mb-4 text-xs text-center">กำลังตั้งครรภ์ หรือให้นมบุตร?</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button onClick={() => setAnswers({...answers, pregnancy: 'yes'})} className={`py-4 rounded-full border text-sm font-bold ${answers.pregnancy === 'yes' ? 'bg-[#A51D24] text-white' : 'bg-white text-gray-400'}`}>ใช่</button>
-                  <button onClick={() => setAnswers({...answers, pregnancy: 'no'})} className={`py-4 rounded-full border text-sm font-bold ${answers.pregnancy === 'no' ? 'bg-[#A51D24] text-white' : 'bg-white text-gray-400'}`}>ไม่ใช่</button>
-                </div>
-              </div>
-              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-5 rounded-full font-bold">ถัดไป</button>
-            </div>
-          )}
-
-          {step === 5 && (
-            <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-gray-800">การใช้ยาคุมกำเนิด</h2>
-              <div className="grid grid-cols-1 gap-3">
-                {[ { id: 'pill', label: 'ทานยาคุม / ฉีด / ฝัง' }, { id: 'stop_soon', label: 'มีแพลนจะหยุดยาคุม' }, { id: 'none', label: 'ไม่ได้ใช้ยาคุมค่ะ' } ].map(opt => (
-                  <button key={opt.id} onClick={() => handleSelect('birthControl', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm font-medium flex items-center justify-between">
-                    <span>{opt.label}</span> <ChevronRight className="w-4 h-4" />
-                  </button>
-                ))}
-              </div>
-              <button onClick={prevStep} className="text-gray-400 text-xs font-bold flex items-center gap-2"><ChevronLeft className="w-3 h-3" /> Back</button>
-            </div>
-          )}
-
-          {step === 6 && (
-            <div className="space-y-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-800 leading-tight">คุณจริงจังกับปัญหานี้แค่ไหน?</h2>
-              <div className="py-10">
-                <input type="range" min="1" max="10" value={answers.seriousness} onChange={(e) => setAnswers({...answers, seriousness: parseInt(e.target.value)})}
-                  className="w-full h-2 bg-red-50 rounded-lg appearance-none cursor-pointer accent-[#A51D24]" />
-                <div className="flex justify-between mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest px-2"><span>1 - สบายๆ</span><span>10 - ต้องดีขึ้นตอนนี้</span></div>
-                <div className="mt-10 text-6xl font-black text-[#A51D24] opacity-20">{answers.seriousness}</div>
-              </div>
-              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl">ถัดไป</button>
-            </div>
-          )}
-
-          {step === 7 && (
-            <div className="space-y-8">
-              {answers.seriousness >= 8 ? (
-                <div className="text-center space-y-6">
-                  <Phone className="w-12 h-12 text-[#A51D24] mx-auto opacity-30" />
-                  <h2 className="text-2xl font-bold text-gray-800">ต้องการรับคำปรึกษาฟรี?</h2>
-                  <input type="tel" placeholder="กรอกเบอร์โทรศัพท์" value={answers.contactInfo.phone} 
-                    onChange={(e) => setAnswers({...answers, contactInfo: {...answers.contactInfo, phone: e.target.value}})}
-                    className="w-full p-6 rounded-3xl bg-[#FDFBF7] border border-red-50 text-center font-bold" />
-                </div>
-              ) : (
-                <div className="text-center space-y-4">
-                   <CheckCircle2 className="w-16 h-16 text-[#A51D24] mx-auto opacity-20" />
-                   <h2 className="text-2xl font-bold text-gray-800">ประเมินเรียบร้อยค่ะ</h2>
-                   <p className="text-gray-500 text-sm">เราพร้อมสรุปสูตรที่เหมาะสมให้คุณแล้ว</p>
-                </div>
-              )}
-              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl">ดูผลการประเมิน</button>
-            </div>
-          )}
-
-          {step === 8 && <ResultDisplay />}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default App;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
