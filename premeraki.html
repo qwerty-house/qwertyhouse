@@ -8,7 +8,13 @@ import {
   Sparkles, 
   RefreshCw, 
   Phone, 
-  Stethoscope
+  Stethoscope,
+  Clock,
+  Check,
+  ShoppingBag,
+  Star,
+  Info,
+  ArrowRight
 } from 'lucide-react';
 
 const App = () => {
@@ -78,71 +84,86 @@ const App = () => {
     const results = {
       ALLERGY_FORBIDDEN: {
         title: "โอบกอดความปลอดภัยก่อนนะคะ ⚠️",
-        description: "พบว่าคุณลูกค้ามีอาการ **แพ้เมล็ดพืชหลักแบบเฉียบพลัน** ซึ่งความปลอดภัยสำคัญที่สุดค่ะ",
+        description: "แอดมินตรวจเช็กแล้ว พบว่าคุณลูกค้ามีอาการ **แพ้เมล็ดพืชหลักแบบเฉียบพลัน** ซึ่งความปลอดภัยสำคัญที่สุดสำหรับ Meraki ค่ะ",
+        note: "* หากเป็นการแพ้แบบภูมิแฝง อาจพิจารณาทานได้เมื่อค่าการแพ้ลดลง แต่หากแพ้เฉียบพลัน ไม่แนะนำให้ทานเด็ดขาดค่ะ",
         color: "text-rose-700", bg: "bg-rose-50", hideCTA: true
       },
       CONSULT_DOCTOR: {
         title: "ความปลอดภัยของคุณสำคัญที่สุด 👩‍⚕️",
-        description: "เนื่องจากมีภาวะร่างกายที่ละเอียดอ่อน แนะนำให้ **ปรึกษาคุณหมอ** ก่อนเริ่มทานนะคะ",
+        description: "เนื่องจากมีภาวะร่างกายที่ละเอียดอ่อน แอดมินแนะนำให้ **ปรึกษาคุณหมอเจ้าของไข้** ก่อนเริ่มทาน เพื่อความสบายใจสูงสุดนะคะ",
+        cta: "สอบถามข้อมูลนำไปปรึกษาคุณหมอ",
         color: "text-rose-700", bg: "bg-rose-50", isRedFlag: true
       },
       ENDO_SPECIAL: {
         title: "สูตรพิเศษเพื่อมดลูกที่เบาสบาย 🌸",
-        description: "สำหรับกลุ่ม Endo/Cyst เราเน้นการลดอักเสบและปรับ Estrogen ที่เด่นเกินไปค่ะ",
-        instruction: "ทานเฉพาะ **ถุง Phase 2** ตลอดทั้งรอบ 28 วัน พร้อมงดนมวัวและของทอดค่ะ",
+        description: "สำหรับกลุ่ม Endo/Cyst เราเน้นการลดอักเสบและปรับ Estrogen ที่เด่นเกินไปให้สมดุลค่ะ",
+        instruction: "ทานเฉพาะ **ถุง Phase 2 (งา+ทานตะวัน)** ตลอดทั้งรอบ 28 วัน พร้อมงดนมวัวและของทอดเพื่อผลลัพธ์ที่ดีที่สุดค่ะ",
         package: "Set B (2+2) For Endo Care",
         image: "images/Set B.jpg",
         price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set B (2+2) ค่ะ กลุ่ม Endo/Cyst"
+        copyMsg: "สนใจ Set B (2+2) ค่ะ ประเมินแล้วเป็นกลุ่ม Endo/Cyst"
       },
       PCOS_MOON: {
         title: "ปรับจังหวะตามรอบพระจันทร์ 🌙",
-        description: "เราจะใช้จังหวะ **New Moon** กำหนดให้ฮอร์โมนเริ่มทำงานใหม่ เพื่อให้การตกไข่สม่ำเสมอค่ะ",
-        instruction: "เริ่ม Phase 1 ในวัน New Moon 14 วัน และสลับ Phase 2 อีก 14 วันค่ะ",
+        description: "เราจะใช้จังหวะ **New Moon** เป็นตัวกำหนดให้ฮอร์โมนเริ่มทำงานใหม่ เพื่อให้การตกไข่กลับมาสม่ำเสมอค่ะ",
+        instruction: "เริ่ม Phase 1 ในวัน New Moon 14 วัน และสลับ Phase 2 อีก 14 วัน ต่อเนื่องอย่างน้อย 6 เดือนค่ะ",
         package: "Set A (1+2) 6-Month Bundle",
         image: "images/Set A.jpg",
+        teaRecommend: "POPS TEA (ช่วยเรื่องเผาผลาญ/PCOS)",
         price: "1,790.-", perDay: "59",
-        copyMsg: "สนใจ Set A (1+2) ค่ะ กลุ่ม PCOS/ลดน้ำหนักยาก"
+        bestValue: true,
+        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่ม PCOS/ลดน้ำหนักยาก"
       },
       PREP_PREGNANCY: {
         title: "เตรียมบ้านที่อุ่นและสมบูรณ์ที่สุด 👶🏻",
-        description: "เน้นบำรุงคุณภาพไข่และผนังมดลูกให้นุ่มอุ่น พร้อมสำหรับการฝังตัวค่ะ",
-        instruction: "ทานสลับ Phase 1&2 อย่างละ 14 วัน เริ่มวันแรกที่ประจำเดือนมาค่ะ",
+        description: "เน้นบำรุงคุณภาพไข่และผนังมดลูกให้นุ่มอุ่น พร้อมสำหรับการฝังตัวของเบบี๋ค่ะ",
+        instruction: "ทานสลับ Phase 1&2 อย่างละ 14 วัน เริ่มวันแรกที่ประจำเดือนมา เพื่อสารอาหารที่จำเป็นต่อการเตรียมตั้งครรภ์ค่ะ",
         package: "Set A (1+2) Prep Pregnancy",
         image: "images/Set A.jpg",
-        price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set A (1+2) ค่ะ เตรียมพร้อมมีเบบี๋"
+        teaRecommend: "HER TEA (สมดุลฮอร์โมน/บำรุงเลือด)",
+        teaImage: "images/hertea.jpg",
+        teaPrice: "790.-", price: "1,790.-", perDay: "64",
+        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วเตรียมพร้อมมีเบบี๋"
       },
       BIRTH_CONTROL_BRIDGE: {
         title: "สะพานเชื่อมสู่ฮอร์โมนธรรมชาติ 🌿",
-        description: "ช่วงเปลี่ยนผ่านจากสังเคราะห์เป็นสร้างเอง ร่างกายต้องการการฟื้นฟูอย่างเต็มที่ค่ะ",
-        instruction: "ทานควบคู่ยาคุมได้ทันที และทานต่อเนื่องหลังหยุดยาเพื่อประคองสมดุลค่ะ",
+        description: "ในช่วงเปลี่ยนผ่านจากรับมาเป็นสร้างฮอร์โมนเอง ร่างกายต้องการเวลาขับฮอร์โมนสังเคราะห์ ฟื้นฟู และเสริมสารอาหารอย่างเต็มที่ค่ะ",
+        instruction: "ทานควบคู่ยาคุมได้ทันที และทานต่อเนื่องหลังหยุดยาเพื่อประคองสมดุลไม่ให้ฮอร์โมนเหวี่ยงค่ะ",
         package: "Set A (1+2) Monthly Balance",
         image: "images/Set A.jpg",
-        price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set A (1+2) ค่ะ กลุ่มใช้ยาคุม/หยุดยา"
+        teaRecommend: "HER TEA (ปรับสมดุลหลังหยุดยา)",
+        teaImage: "images/hertea.jpg",
+        teaPrice: "790.-", price: "1,790.-", perDay: "64",
+        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่มใช้ยาคุม/หยุดยา"
       },
       STANDARD_PMS: {
         title: "ให้ทุกเดือนเป็นวันที่สดใส ✨",
         description: "บอกลางอแง สิวบุก และอารมณ์เหวี่ยง... ให้ธรรมชาติช่วยประคองฮอร์โมนให้นิ่งสงบนะคะ",
-        instruction: "ทานสลับ Phase 1&2 ตามรอบเดือนปกติ ต่อเนื่อง 3 เดือนเพื่อผลลัพธ์ที่ยั่งยืนค่ะ",
+        instruction: "ทานสลับ Phase 1&2 ตามรอบเดือนปกติ ทานต่อเนื่อง 3 เดือนเพื่อผลลัพธ์ที่ยั่งยืนค่ะ",
         package: "Set A (1+2) Monthly Balance",
         image: "images/Set A.jpg",
-        price: "1,790.-", perDay: "64",
-        copyMsg: "สนใจ Set A (1+2) ค่ะ ลดอาการ PMS ทั่วไป"
+        teaRecommend: "HER TEA (สูตรสมดุลทุกวัน)",
+        teaImage: "images/hertea.jpg",
+        teaPrice: "790.-", price: "1,790.-", perDay: "64",
+        copyMsg: "สนใจ Set A (1+2) ค่ะ อยากลดอาการ PMS ทั่วไป"
       }
     };
 
     const res = results[resultKey];
+
     const formatText = (text) => {
       if (!text) return "";
-      const parts = text.split(/(\*\*.*?\*\*)/);
-      return parts.map((part, i) => part.startsWith('**') ? <strong key={i} className="font-bold text-[#A51D24]">{part.slice(2, -2)}</strong> : part);
+      const parts = text.split(/(\*\*.*?\*\*|<u>.*?<\/u>)/);
+      return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-bold text-[#A51D24]">{part.slice(2, -2)}</strong>;
+        if (part.startsWith('<u>') && part.endsWith('</u>')) return <u key={i} className="underline decoration-red-200 underline-offset-4">{part.slice(3, -4)}</u>;
+        return part;
+      });
     };
 
     return (
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className={`p-7 rounded-[2.5rem] ${res.bg || 'bg-[#FDFBF7]'} border border-red-100 shadow-sm relative`}>
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700" style={{ fontFamily: '"IBM Plex Sans Thai", sans-serif' }}>
+        <div className={`p-7 rounded-[2.5rem] ${res.bg || 'bg-[#FDFBF7]'} border border-red-100 shadow-sm relative overflow-hidden`}>
           <div className="flex justify-between items-start mb-6">
               <h2 className={`text-2xl font-bold ${res.color || 'text-[#A51D24]'} leading-tight`}>{res.title}</h2>
               <Sparkles className="w-6 h-6 text-[#A51D24]" />
@@ -159,25 +180,91 @@ const App = () => {
 
             {!res.hideCTA && !res.isRedFlag && (
               <div className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-red-50 flex flex-col gap-4">
-                <div className="w-full h-48 bg-white rounded-[2rem] overflow-hidden flex items-center justify-center">
-                  <img src={res.image} alt={res.package} className="w-full h-full object-contain" 
-                    onError={(e) => { e.target.style.display = 'none'; e.target.parentElement.innerHTML = '<div class="text-gray-300 text-xs">Image not found in /images folder</div>'; }} />
+                <div className="w-full h-48 bg-white rounded-[2rem] overflow-hidden relative flex items-center justify-center">
+                  <img 
+                    src={res.image} 
+                    alt={res.package} 
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.parentElement.innerHTML = `<div class="text-gray-300 text-[10px] text-center p-4">ไม่พบรูปภาพในโฟลเดอร์ images/</div>`;
+                    }}
+                  />
                 </div>
                 <div className="px-2 pb-2">
                   <h4 className="font-bold text-gray-800 text-base">{res.package}</h4>
                   <div className="flex items-baseline justify-between mt-3">
-                    <span className="text-2xl font-black text-[#A51D24]">{res.price}</span>
-                    <div className="bg-red-50 px-3 py-1 rounded-full text-[11px] font-bold text-[#A51D24]">เฉลี่ย {res.perDay}.- / วัน</div>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-2xl font-black text-[#A51D24]">{res.price}</span>
+                      <span className="text-[10px] text-gray-400">/ รอบ</span>
+                    </div>
+                    <div className="bg-red-50 px-3 py-1 rounded-full">
+                      <span className="text-[11px] font-bold text-[#A51D24]">เฉลี่ยเพียง {res.perDay}.- / วัน</span>
+                    </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {res.teaRecommend && (
+              <div className="bg-[#FFF5F1] rounded-[2.5rem] p-4 border border-orange-100 flex items-center gap-4">
+                <div className="w-20 h-20 bg-white rounded-2xl overflow-hidden shrink-0 border border-orange-50 shadow-sm flex items-center justify-center">
+                  <img 
+                    src={res.teaImage || "images/hertea.jpg"} 
+                    alt={res.teaRecommend} 
+                    className="w-full h-full object-contain" 
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[9px] text-orange-500 font-bold uppercase tracking-widest">Add-on (Hernest)</p>
+                  <h4 className="font-bold text-gray-800 text-sm">{res.teaRecommend}</h4>
+                  <p className="text-sm font-bold text-orange-600 mt-0.5">ราคา {res.teaPrice || "790.-"}</p>
                 </div>
               </div>
             )}
           </div>
         </div>
-        {!res.hideCTA && (
-          <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('สนใจ: ' + res.copyMsg)}`)} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl hover:scale-[1.02] active:scale-95 transition-transform">รับเซตแนะนำ (ดูแลพิเศษ) 🌟</button>
-        )}
-        <button onClick={resetQuiz} className="w-full text-gray-400 text-xs font-bold py-2 tracking-widest flex items-center justify-center gap-2"><RefreshCw className="w-3 h-3" /> เริ่มประเมินใหม่</button>
+
+        <div className="space-y-4">
+          {!res.hideCTA && !res.isRedFlag && (
+            <>
+              <button 
+                onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('สวัสดีค่ะ ผลประเมินคือ: ' + res.copyMsg)}`)}
+                className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-2xl flex items-center justify-center gap-3 transform hover:scale-[1.02] active:scale-95 text-lg"
+              >
+                รับเซตแนะนำ (ดูแลพิเศษ) 🌟
+              </button>
+              <button 
+                onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ขอรับเซตทดลอง 1 รอบก่อนค่ะ')}`)}
+                className="w-full bg-white border-2 border-red-500 text-[#A51D24] font-bold py-5 rounded-full active:scale-95 flex items-center justify-center"
+              >
+                ขอเลือก "เซตเริ่มต้น" 1 รอบก่อนค่ะ
+              </button>
+            </>
+          )}
+
+          {answers.seriousness >= 8 && answers.contactInfo.phone && (
+            <div className="p-6 bg-green-50 rounded-[2.5rem] border border-green-100 text-center">
+               <p className="text-sm font-bold text-green-800">แอดมินรับทราบค่ะ! เราจะติดต่อกลับที่เบอร์ {answers.contactInfo.phone}</p>
+            </div>
+          )}
+
+          {(res.isRedFlag || !res.hideCTA) && (
+            <div className="p-6 bg-white border border-gray-100 rounded-[2.5rem] text-center">
+               <Stethoscope className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+               <h4 className="text-sm font-bold text-gray-700">คำแนะนำทางการแพทย์</h4>
+               <p className="text-[11px] text-gray-400 mt-1 italic">หากท่านมีโรคประจำตัวร้ายแรง แนะนำให้ปรึกษาแพทย์ก่อนทานนะคะ</p>
+               {res.isRedFlag && (
+                 <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ต้องการข้อมูลสารอาหารไปปรึกษาคุณหมอค่ะ')}`)} className="mt-4 px-6 py-2 bg-gray-800 text-white rounded-full text-xs font-bold">คุยกับแอดมิน</button>
+               )}
+            </div>
+          )}
+
+          <div className="text-center pt-4">
+             <button onClick={resetQuiz} className="mt-8 text-gray-300 text-[10px] uppercase tracking-widest font-bold flex items-center gap-2 mx-auto hover:text-red-300 transition-colors"><RefreshCw className="w-3 h-3" /> เริ่มประเมินใหม่</button>
+          </div>
+        </div>
       </div>
     );
   };
@@ -189,12 +276,12 @@ const App = () => {
         <p className="text-red-300 text-[10px] uppercase tracking-[0.3em] font-bold">Nature is the best medicine</p>
       </div>
 
-      <div className="w-full max-w-md bg-white rounded-[3.5rem] shadow-2xl border border-red-50 overflow-hidden">
+      <div className="w-full max-w-md bg-white rounded-[3.5rem] shadow-2xl overflow-hidden border border-red-50">
         {step > 0 && step < 8 && (
           <div className="px-12 pt-10 flex justify-between items-center">
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5, 6, 7].map((s) => (
-                <div key={s} className={`h-1.5 w-5 rounded-full transition-all duration-500 ${step >= s ? 'bg-[#A51D24]' : 'bg-red-50'}`}></div>
+                <div key={s} className={`h-1.5 w-5 rounded-full transition-all duration-700 ${step >= s ? 'bg-[#A51D24]' : 'bg-red-50'}`}></div>
               ))}
             </div>
           </div>
@@ -202,39 +289,44 @@ const App = () => {
 
         <div className="p-10">
           {step === 0 && (
-            <div className="text-center space-y-10 animate-in fade-in slide-in-from-bottom-5">
+            <div className="text-center space-y-10 animate-in fade-in">
               <Heart className="w-16 h-16 text-[#A51D24] mx-auto opacity-20" />
               <div className="space-y-4">
                 <h2 className="text-4xl font-bold text-gray-800 leading-tight">สวัสดีค่ะ<br/><span className="text-[#A51D24]">คนเก่ง</span></h2>
-                <p className="text-gray-500 text-base">แอดมินชวนมาทำแบบประเมินสุขภาพฮอร์โมนกันค่ะ</p>
+                <p className="text-gray-500 font-medium text-base">แอดมินชวนมาทำแบบประเมินสุขภาพกันค่ะ</p>
               </div>
-              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl flex items-center justify-center gap-2">เริ่มต้น <ChevronRight /></button>
+              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl flex items-center justify-center group text-lg active:scale-95">เริ่มต้นดูแลตัวเอง <ChevronRight className="ml-2" /></button>
             </div>
           )}
 
           {step === 1 && (
-            <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-gray-800">เป้าหมายที่คุณต้องการจัดการ</h2>
-              <div className="grid gap-3">
+            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
+              <h2 className="text-2xl font-bold text-gray-800 leading-tight">เป้าหมายที่ต้องการจัดการ</h2>
+              <div className="grid grid-cols-1 gap-3">
                 {[
-                  { id: 'pms', label: 'ปวดท้องเมนส์ / สิวฮอร์โมน / อารมณ์เหวี่ยง' },
+                  { id: 'pms', label: 'ปวดท้องเมนส์ / สิวฮอร์โมน' },
                   { id: 'pcos', label: 'PCOS / ประจำเดือนมาไม่ปกติ' },
-                  { id: 'weight_loss', label: 'ปัญหาลดน้ำหนักยาก / บวมน้ำ' },
+                  { id: 'weight_loss', label: 'ลดน้ำหนักยาก / บวมน้ำ' },
                   { id: 'pregnancy', label: 'เตรียมพร้อมมีเบบี๋ / บำรุงไข่' },
-                  { id: 'general', label: 'ดูแลสุขภาพและปรับสมดุลทั่วไป' }
+                  { id: 'menopause', label: 'วัยทอง / นอนไม่หลับ' },
+                  { id: 'general', label: 'ปรับสมดุลทั่วไป' }
                 ].map(opt => (
-                  <button key={opt.id} onClick={() => handleSelect('goal', opt.id)} className="text-left p-5 rounded-3xl border border-red-50 bg-[#FDFBF7] hover:border-red-300 transition-all text-sm font-medium">{opt.label}</button>
+                  <button key={opt.id} onClick={() => handleSelect('goal', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] hover:border-red-300 transition-all text-sm font-medium active:scale-95 flex items-center justify-between">
+                    <span>{opt.label}</span> <ChevronRight className="w-4 h-4" />
+                  </button>
                 ))}
               </div>
             </div>
           )}
 
           {step === 2 && (
-            <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-gray-800">วงจรรอบเดือนของท่าน</h2>
-              <div className="grid gap-3">
-                {[{ id: 'regular', label: 'มาสม่ำเสมอ' }, { id: 'irregular', label: 'มาไม่ปกติ / ขาดหาย' }, { id: 'none', label: 'วัยหมดประจำเดือน' }].map(opt => (
-                  <button key={opt.id} onClick={() => handleSelect('regularity', opt.id)} className="text-left p-5 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm font-medium">{opt.label}</button>
+            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
+              <h2 className="text-2xl font-bold text-gray-800">วงจรรรอบเดือนของท่าน</h2>
+              <div className="grid grid-cols-1 gap-3">
+                {[{ id: 'regular', label: 'มาสม่ำเสมอ' }, { id: 'irregular', label: 'มาไม่ปกติ / ขาดหาย' }, { id: 'none', label: 'เข้าสู่วัยหมดประจำเดือน' }].map(opt => (
+                  <button key={opt.id} onClick={() => handleSelect('regularity', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm font-medium flex items-center justify-between">
+                    <span>{opt.label}</span> <ChevronRight className="w-4 h-4" />
+                  </button>
                 ))}
               </div>
               <button onClick={prevStep} className="text-gray-400 text-xs font-bold flex items-center gap-2"><ChevronLeft className="w-3 h-3" /> Back</button>
@@ -242,33 +334,37 @@ const App = () => {
           )}
 
           {step === 3 && (
-            <div className="space-y-8">
+            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
               <h2 className="text-2xl font-bold text-gray-800">ประวัติสุขภาพที่สำคัญ</h2>
-              <div className="grid gap-2">
-                {[{ id: 'endo', label: 'เยื่อบุมดลูกเจริญผิดที่' }, { id: 'cysts', label: 'ช็อกโกแลตซีสต์' }, { id: 'fibroids', label: 'เนื้องอกในมดลูก' }, { id: 'cancer', label: 'มะเร็งที่ไวต่อฮอร์โมน' }, { id: 'none', label: 'ไม่มีภาวะข้างต้น' }].map(opt => (
+              <div className="grid grid-cols-1 gap-2">
+                {[{ id: 'endo', label: 'เยื่อบุมดลูกเจริญผิดที่ / ซีสต์' }, { id: 'fibroids', label: 'เนื้องอกในมดลูก' }, { id: 'cancer', label: 'มะเร็งที่ไวต่อฮอร์โมน' }, { id: 'warfarin', label: 'ทานยาละลายลิ่มเลือด' }, { id: 'none', label: 'ไม่มีภาวะข้างต้น' }].map(opt => (
                   <button key={opt.id} onClick={() => opt.id === 'none' ? (setAnswers({...answers, medical: ['none']}), nextStep()) : toggleSelection('medical', opt.id)}
-                    className={`text-left p-5 rounded-3xl border transition-all text-sm font-medium ${answers.medical.includes(opt.id) ? 'border-[#A51D24] bg-red-50' : 'border-red-50'}`}>{opt.label}</button>
+                    className={`text-left p-5 rounded-3xl border transition-all flex justify-between items-center text-sm ${answers.medical.includes(opt.id) ? 'border-[#A51D24] bg-red-50 text-[#A51D24]' : 'border-red-50'}`}>
+                    {opt.label} {answers.medical.includes(opt.id) && <CheckCircle2 className="w-5 h-5" />}
+                  </button>
                 ))}
               </div>
-              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-5 rounded-full font-bold">ยืนยัน</button>
+              <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-5 rounded-full font-bold">ยืนยันและถัดไป</button>
             </div>
           )}
 
           {step === 4 && (
-            <div className="space-y-8">
+            <div className="space-y-8 animate-in slide-in-from-right-8 duration-500">
               <h2 className="text-2xl font-bold text-gray-800">ประวัติการแพ้เมล็ดพืช</h2>
-              <div className="grid gap-2">
-                {['flax', 'pumpkin', 'sesame', 'sunflower', 'none'].map(opt => (
-                  <button key={opt} onClick={() => opt === 'none' ? setAnswers({...answers, allergies: ['none']}) : toggleSelection('allergies', opt)}
-                    className={`text-left p-4 rounded-2xl border text-sm ${answers.allergies.includes(opt) ? 'border-[#A51D24] bg-red-50' : 'border-red-50'}`}>แพ้ {opt}</button>
+              <div className="grid grid-cols-1 gap-2">
+                {[{ id: 'flax', label: 'แพ้เมล็ดแฟลกซ์ / ฟักทอง' }, { id: 'sesame', label: 'แพ้งา / ทานตะวัน' }, { id: 'none', label: 'ไม่มีประวัติแพ้ค่ะ' }].map(opt => (
+                  <button key={opt.id} onClick={() => opt.id === 'none' ? setAnswers({...answers, allergies: ['none']}) : toggleSelection('allergies', opt.id)}
+                    className={`text-left p-4 rounded-2xl border text-sm ${answers.allergies.includes(opt.id) ? 'border-[#A51D24] bg-red-50' : 'border-red-50'}`}>
+                    {opt.label}
+                  </button>
                 ))}
               </div>
-              <div className="p-6 bg-[#FDFBF7] rounded-[2rem] border border-red-50">
-                  <p className="font-bold mb-4 text-xs text-center">กำลังตั้งครรภ์/ให้นมบุตร?</p>
-                  <div className="flex gap-2">
-                    <button onClick={() => setAnswers({...answers, pregnancy: 'yes'})} className={`flex-1 py-4 rounded-full border text-sm ${answers.pregnancy === 'yes' ? 'bg-[#A51D24] text-white' : 'bg-white'}`}>ใช่</button>
-                    <button onClick={() => setAnswers({...answers, pregnancy: 'no'})} className={`flex-1 py-4 rounded-full border text-sm ${answers.pregnancy === 'no' ? 'bg-[#A51D24] text-white' : 'bg-white'}`}>ไม่ใช่</button>
-                  </div>
+              <div className="p-6 bg-[#FDFBF7] rounded-[2.5rem] border border-red-50">
+                <p className="font-bold mb-4 text-xs text-center">กำลังตั้งครรภ์ หรือให้นมบุตร?</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={() => setAnswers({...answers, pregnancy: 'yes'})} className={`py-4 rounded-full border text-sm font-bold ${answers.pregnancy === 'yes' ? 'bg-[#A51D24] text-white' : 'bg-white text-gray-400'}`}>ใช่</button>
+                  <button onClick={() => setAnswers({...answers, pregnancy: 'no'})} className={`py-4 rounded-full border text-sm font-bold ${answers.pregnancy === 'no' ? 'bg-[#A51D24] text-white' : 'bg-white text-gray-400'}`}>ไม่ใช่</button>
+                </div>
               </div>
               <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-5 rounded-full font-bold">ถัดไป</button>
             </div>
@@ -277,33 +373,47 @@ const App = () => {
           {step === 5 && (
             <div className="space-y-8">
               <h2 className="text-2xl font-bold text-gray-800">การใช้ยาคุมกำเนิด</h2>
-              <div className="grid gap-3">
-                {[{ id: 'pill', label: 'ใช้ยาคุมอยู่' }, { id: 'stop', label: 'แพลนจะหยุดยาคุม' }, { id: 'none', label: 'ไม่ได้ใช้ค่ะ' }].map(opt => (
-                  <button key={opt.id} onClick={() => handleSelect('birthControl', opt.id)} className="text-left p-5 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm">{opt.label}</button>
+              <div className="grid grid-cols-1 gap-3">
+                {[ { id: 'pill', label: 'ทานยาคุม / ฉีด / ฝัง' }, { id: 'stop_soon', label: 'มีแพลนจะหยุดยาคุม' }, { id: 'none', label: 'ไม่ได้ใช้ยาคุมค่ะ' } ].map(opt => (
+                  <button key={opt.id} onClick={() => handleSelect('birthControl', opt.id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm font-medium flex items-center justify-between">
+                    <span>{opt.label}</span> <ChevronRight className="w-4 h-4" />
+                  </button>
                 ))}
               </div>
-              <button onClick={prevStep} className="text-gray-400 text-xs font-bold">Back</button>
+              <button onClick={prevStep} className="text-gray-400 text-xs font-bold flex items-center gap-2"><ChevronLeft className="w-3 h-3" /> Back</button>
             </div>
           )}
 
           {step === 6 && (
             <div className="space-y-8 text-center">
-              <h2 className="text-2xl font-bold text-gray-800">ความจริงจังในการจัดการปัญหานี้</h2>
+              <h2 className="text-2xl font-bold text-gray-800 leading-tight">คุณจริงจังกับปัญหานี้แค่ไหน?</h2>
               <div className="py-10">
                 <input type="range" min="1" max="10" value={answers.seriousness} onChange={(e) => setAnswers({...answers, seriousness: parseInt(e.target.value)})}
                   className="w-full h-2 bg-red-50 rounded-lg appearance-none cursor-pointer accent-[#A51D24]" />
-                <div className="flex justify-between mt-4 text-[10px] text-gray-400 font-bold uppercase"><span>1 - สบายๆ</span><span>10 - ต้องดีขึ้นตอนนี้</span></div>
-                <div className="mt-6 text-5xl font-black text-[#A51D24] opacity-30">{answers.seriousness}</div>
+                <div className="flex justify-between mt-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest px-2"><span>1 - สบายๆ</span><span>10 - ต้องดีขึ้นตอนนี้</span></div>
+                <div className="mt-10 text-6xl font-black text-[#A51D24] opacity-20">{answers.seriousness}</div>
               </div>
               <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl">ถัดไป</button>
             </div>
           )}
 
           {step === 7 && (
-            <div className="space-y-8 text-center">
-              <CheckCircle2 className="w-16 h-16 text-[#A51D24] mx-auto opacity-20" />
-              <h2 className="text-2xl font-bold text-gray-800">ประเมินเรียบร้อยแล้วค่ะ</h2>
-              <p className="text-gray-500 text-sm">แอดมินกำลังสรุปสูตรที่เหมาะกับคุณให้ค่ะ</p>
+            <div className="space-y-8">
+              {answers.seriousness >= 8 ? (
+                <div className="text-center space-y-6">
+                  <Phone className="w-12 h-12 text-[#A51D24] mx-auto opacity-30" />
+                  <h2 className="text-2xl font-bold text-gray-800">ต้องการรับคำปรึกษาฟรี?</h2>
+                  <input type="tel" placeholder="กรอกเบอร์โทรศัพท์" value={answers.contactInfo.phone} 
+                    onChange={(e) => setAnswers({...answers, contactInfo: {...answers.contactInfo, phone: e.target.value}})}
+                    className="w-full p-6 rounded-3xl bg-[#FDFBF7] border border-red-50 text-center font-bold" />
+                </div>
+              ) : (
+                <div className="text-center space-y-4">
+                   <CheckCircle2 className="w-16 h-16 text-[#A51D24] mx-auto opacity-20" />
+                   <h2 className="text-2xl font-bold text-gray-800">ประเมินเรียบร้อยค่ะ</h2>
+                   <p className="text-gray-500 text-sm">เราพร้อมสรุปสูตรที่เหมาะสมให้คุณแล้ว</p>
+                </div>
+              )}
               <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl">ดูผลการประเมิน</button>
             </div>
           )}
