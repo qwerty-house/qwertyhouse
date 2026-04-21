@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MERAKI - Seed Cycling Quiz</title>
+    <title>MERAKI - Personal Hormonal Assessment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -13,12 +13,18 @@
 
     <style>
         body { font-family: 'IBM Plex Sans Thai', sans-serif; background-color: #FDFBF7; }
-        .animate-in { animation: fadeIn 0.8s ease-out forwards; }
+        .animate-in { animation: fadeIn 0.7s ease-out forwards; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
         button { -webkit-tap-highlight-color: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px; width: 24px;
+            border-radius: 50%; background: #A51D24;
+            cursor: pointer; box-shadow: 0 0 10px rgba(165, 29, 36, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -27,14 +33,16 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         const { 
-            ChevronRight, ChevronLeft, CheckCircle2, MessageCircle, 
-            Sparkles, Moon, RefreshCw, XCircle, Calendar, Heart, Clock, Check, Star 
+            ChevronRight, ChevronLeft, CheckCircle2, MessageCircle, Calendar, Heart, 
+            Sparkles, Moon, RefreshCw, Clock, Check, Phone, Stethoscope 
         } = lucide;
 
         const App = () => {
             const [step, setStep] = useState(0); 
             const [answers, setAnswers] = useState({
-                goal: '', regularity: '', medical: [], allergies: [], pregnancy: '', birthControl: ''
+                goal: '', regularity: '', medical: [], allergies: [], 
+                allergyType: 'acute', pregnancy: '', birthControl: '',
+                seriousness: 5, contactInfo: { phone: '', timeSlot: '' }
             });
 
             useEffect(() => { lucide.createIcons(); }, [step]);
@@ -43,12 +51,16 @@
             const prevStep = () => setStep(prev => prev - 1);
             const resetQuiz = () => {
                 setStep(0);
-                setAnswers({ goal: '', regularity: '', medical: [], allergies: [], pregnancy: '', birthControl: '' });
+                setAnswers({
+                    goal: '', regularity: '', medical: [], allergies: [], 
+                    allergyType: 'acute', pregnancy: '', birthControl: '',
+                    seriousness: 5, contactInfo: { phone: '', timeSlot: '' }
+                });
             };
 
             const handleSelect = (field, value) => {
                 setAnswers(prev => ({ ...prev, [field]: value }));
-                if (field !== 'medical' && field !== 'allergies') nextStep();
+                if (!['medical', 'allergies', 'contactInfo'].includes(field)) nextStep();
             };
 
             const toggleSelection = (field, value) => {
@@ -61,11 +73,14 @@
             };
 
             const getResult = () => {
-                const { goal, regularity, medical, pregnancy, birthControl, allergies } = answers;
-                if (allergies.some(a => ['flax', 'pumpkin', 'sesame', 'sunflower'].includes(a))) return 'ALLERGY_FORBIDDEN';
+                const { goal, regularity, medical, pregnancy, birthControl, allergies, allergyType } = answers;
+                const coreSeeds = ['flax', 'pumpkin', 'sesame', 'sunflower'];
+                const hasCoreAllergy = allergies.some(a => coreSeeds.includes(a));
+                
+                if (hasCoreAllergy && allergyType === 'acute') return 'ALLERGY_FORBIDDEN';
                 if (pregnancy === 'yes' || medical.includes('cancer') || medical.includes('warfarin')) return 'CONSULT_DOCTOR';
                 if (medical.includes('endo') || medical.includes('cysts') || medical.includes('fibroids')) return 'ENDO_SPECIAL';
-                if (regularity === 'irregular' || goal === 'pcos') return 'PCOS_MOON';
+                if (regularity === 'irregular' || goal === 'pcos' || goal === 'weight_loss') return 'PCOS_MOON';
                 if (goal === 'pregnancy') return 'PREP_PREGNANCY';
                 if (birthControl !== 'none') return 'BIRTH_CONTROL_BRIDGE';
                 return 'STANDARD_PMS';
@@ -74,163 +89,106 @@
             const resultKey = getResult();
 
             const ResultDisplay = () => {
-                const commonStats = [
-                    { label: "ลดอาการปวดประจำเดือน", value: "94%" },
-                    { label: "อาการ PMS ลดลง", value: "88%" },
-                    { label: "อาการบวมก่อนเมนส์ลดลง", value: "79%" }
-                ];
-                const trustBadges = ["ORGANIC USDA", "NON-GMO", "VEGAN", "NO SUGAR", "ปั่นใหม่ทุกออเดอร์"];
-                
                 const results = {
                     ALLERGY_FORBIDDEN: {
                         title: "โอบกอดความปลอดภัยก่อนนะคะ ⚠️",
-                        description: "แอดมินตรวจเช็กแล้ว พบว่าคุณลูกค้ามีอาการ **แพ้เมล็ดพืชหลัก** ใน Seed Cycling ของเรา ซึ่งความปลอดภัยของคุณลูกค้าสำคัญที่สุดสำหรับ Meraki ค่ะ",
-                        note: "* เรา <u>ไม่แนะนำให้ทาน</u> หากมีอาการแพ้เมล็ดหลัก เพราะสุขภาพคุณลูกค้าสำคัญที่สุดค่ะ",
+                        description: "แอดมินตรวจเช็กแล้ว พบว่าคุณลูกค้ามีอาการ **แพ้เมล็ดพืชหลักแบบเฉียบพลัน** ซึ่งความปลอดภัยสำคัญที่สุดสำหรับ Meraki ค่ะ",
+                        note: "* หากเป็นการแพ้แบบภูมิแฝง อาจพิจารณาทานได้เมื่อค่าการแพ้ลดลง แต่หากแพ้เฉียบพลัน <u>ไม่แนะนำให้ทานเด็ดขาด</u> ค่ะ",
                         color: "text-rose-700", bg: "bg-rose-50", hideCTA: true
                     },
                     CONSULT_DOCTOR: {
-                        title: "ให้คุณหมอดูแลควบคู่ไปนะคะ 👩‍⚕️",
-                        description: "ด้วยภาวะร่างกายที่ละเอียดอ่อนในขณะนี้ แอดมินอยากให้คุณลูกค้า **ปรึกษาคุณหมอเจ้าของไข้** ก่อนเริ่มทาน Seed Cycling เพื่อความสบายใจสูงสุดนะคะ",
-                        color: "text-rose-700", bg: "bg-rose-50",
-                        copyMsg: "ต้องการข้อมูลเพิ่มเติมเพื่อนำไปปรึกษาคุณหมอค่ะ"
+                        title: "ความปลอดภัยของคุณสำคัญที่สุด 👩‍⚕️",
+                        description: "เนื่องจากมีภาวะร่างกายที่ละเอียดอ่อน แอดมินแนะนำให้ **ปรึกษาคุณหมอเจ้าของไข้** ก่อนเริ่มทาน เพื่อความสบายใจสูงสุดนะคะ",
+                        color: "text-rose-700", bg: "bg-rose-50", isRedFlag: true
                     },
                     ENDO_SPECIAL: {
-                        title: "Seed Cycling สูตรดูแลมดลูก 🌸",
-                        description: "กอดๆ นะคะคนเก่ง... สูตรนี้ออกแบบมาเพื่อ **ปลอบประโลมมดลูก** จากภาวะ Estrogen เด่น หรือ Progesterone ต่ำโดยเฉพาะค่ะ",
-                        instruction: "ทานเฉพาะ **ถุง Phase 2 (งาและทานตะวัน)** ตลอดทั้งรอบ 28 วัน (วันละ 1 สคูป) เริ่มวันแรกที่ประจำเดือนมาได้เลยค่ะ",
-                        whyDuration: "ร่างกายต้องใช้เวลาอย่างน้อย **3 เดือน** เพื่อให้เนื้อเยื่อต่างๆ <u>อักเสบน้อยลงอย่างยั่งยืน</u> ค่ะ",
-                        package: "Set B (2+2) For Endometriosis", price: "1,790.-", perDay: "64.-",
-                        copyMsg: "สนใจ Set B (2+2) ค่ะ ประเมินแล้วอยู่ในกลุ่ม Endo/ปวดท้องหนัก"
+                        title: "สูตรพิเศษเพื่อมดลูกที่เบาสบาย 🌸",
+                        description: "สำหรับกลุ่ม Endo/Cyst เราเน้นการลดอักเสบและปรับ Estrogen ที่เด่นเกินไปให้สมดุลค่ะ",
+                        instruction: "ทานเฉพาะ **ถุง Phase 2 (งา+ทานตะวัน)** ตลอดทั้งรอบ 28 วัน พร้อมงดนมวัวและของทอดเพื่อผลลัพธ์ที่ดีที่สุดค่ะ",
+                        package: "Set B (2+2) For Endo Care", image: "Set B.jpg", price: "1,790.-", perDay: "64",
+                        copyMsg: "สนใจ Set B (2+2) ค่ะ ประเมินแล้วเป็นกลุ่ม Endo/Cyst"
                     },
                     PCOS_MOON: {
-                        title: "ปรับจังหวะตามแสงจันทร์นะคะ 🌙",
-                        description: "ไม่ต้องกังวลนะคะ... เราจะใช้ **รอบพระจันทร์ (New Moon)** ช่วยเตือนจังหวะให้ระบบฮอร์โมนกลับมาทำงานปกติค่ะ",
-                        instruction: "เริ่มทาน **Phase 1** ในวัน New Moon 14 วัน แล้วสลับเป็น **Phase 2** อีก 14 วันนะคะ",
-                        whyDuration: "สำหรับ PCOS ร่างกายต้องการการฟื้นฟูต่อเนื่องอย่างน้อย **6 เดือน** เพื่อให้การตกไข่กลับมา <u>สม่ำเสมอตามธรรมชาติ</u> ค่ะ",
-                        package: "Set A (1+1) Monthly Balance", price: "1,790.-", perDay: "64.-", bestValue: true,
-                        copyMsg: "สนใจ Set A (1+1) ค่ะ ประเมินแล้วอยู่ในกลุ่ม PCOS/รอบพระจันทร์"
+                        title: "ปรับจังหวะตามรอบพระจันทร์ 🌙",
+                        description: "เราจะใช้จังหวะ **New Moon** เป็นตัวกำหนดให้ฮอร์โมนเริ่มทำงานใหม่ เพื่อให้การตกไข่กลับมาสม่ำเสมอค่ะ",
+                        instruction: "เริ่ม Phase 1 ในวัน New Moon 14 วัน และสลับ Phase 2 อีก 14 วัน ต่อเนื่องอย่างน้อย 6 เดือนค่ะ",
+                        package: "Set A (1+2) 6-Month Bundle", image: "Set A.jpg", teaRecommend: "POPS TEA", price: "1,790.-", perDay: "59", bestValue: true,
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่ม PCOS/ลดน้ำหนักยาก"
                     },
                     PREP_PREGNANCY: {
-                        title: "เตรียมบ้านหลังอุ่นให้เบบี๋ตัวน้อย 👶🏻",
-                        description: "ยินดีด้วยนะคะคุณแม่... เราจะช่วย **บำรุงไข่ให้มีคุณภาพ** และทำให้ผนังมดลูก <u>นุ่มและอุ่น</u> พร้อมสำหรับการฝังตัวค่ะ",
-                        instruction: "ทานสลับ **Phase 1 และ 2** (อย่างละ 14 วัน) เริ่มวันแรกที่ประจำเดือนมา เพื่อเติมสารอาหารที่จำเป็นต่อฮอร์โมนคุณแม่ค่ะ",
-                        whyDuration: "การเตรียมคุณภาพไข่ต้องใช้เวลาประมาณ **90-100 วัน** การทานล่วงหน้า **3 เดือน** จึงสำคัญมากเพื่อให้พร้อมที่สุดค่ะ",
-                        package: "Set A (1+1) Monthly Balance", price: "1,790.-", perDay: "64.-",
-                        copyMsg: "สนใจ Set A (1+1) ค่ะ ประเมินแล้วอยู่ในกลุ่มเตรียมตั้งครรภ์"
+                        title: "เตรียมบ้านที่อุ่นและสมบูรณ์ที่สุด 👶🏻",
+                        description: "เน้นบำรุงคุณภาพไข่และผนังมดลูกให้นุ่มอุ่น พร้อมสำหรับการฝังตัวของเบบี๋ค่ะ",
+                        instruction: "ทานสลับ Phase 1&2 อย่างละ 14 วัน เริ่มวันแรกที่ประจำเดือนมา เพื่อสารอาหารที่จำเป็นต่อการเตรียมตั้งครรภ์ค่ะ",
+                        package: "Set A (1+2) Prep Pregnancy", image: "Set A.jpg", teaRecommend: "HER TEA", price: "1,790.-", perDay: "64",
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วเตรียมพร้อมมีเบบี๋"
                     },
                     BIRTH_CONTROL_BRIDGE: {
-                        title: "ให้เวลาร่างกายได้ตื่นอีกครั้ง 🌿",
-                        description: "การหยุดยาคุมคือการปลดปล่อยฮอร์โมนธรรมชาติ... แอดมินจะช่วยดูแลไม่ให้ร่างกายตกใจจน **สิวเห่อหรือผมร่วง** นะคะ",
-                        instruction: "ทาน **ควบคู่ยาคุม 3 เดือนแรก** และทานต่อเนื่อง <u>หลังหยุดยา</u> เพื่อประคองสมดุลไม่ให้ฮอร์โมนเหวี่ยงค่ะ",
-                        whyDuration: "ร่างกายต้องการเวลาขับฮอร์โมนสังเคราะห์และสร้างแร่ธาตุใหม่ การทาน **3 เดือนขึ้นไป** จะเห็นผลลัพธ์ที่ชัดเจนค่ะ",
-                        package: "Set A (1+1) Monthly Balance", price: "1,790.-", perDay: "64.-",
-                        copyMsg: "สนใจ Set A (1+1) ค่ะ ประเมินแล้วอยู่ในกลุ่มทานยาคุม/จะหยุดยา"
+                        title: "สะพานเชื่อมสู่ฮอร์โมนธรรมชาติ 🌿",
+                        description: "ในช่วงเปลี่ยนผ่านจากรับมาเป็นสร้างฮอร์โมนเอง ร่างกายต้องการเวลาขับฮอร์โมนสังเคราะห์ ฟื้นฟู และเสริมสารอาหารอย่างเต็มที่ค่ะ",
+                        instruction: "ทานควบคู่ยาคุมได้ทันที และทานต่อเนื่องหลังหยุดยาเพื่อประคองสมดุลไม่ให้ฮอร์โมนเหวี่ยงค่ะ",
+                        package: "Set A (1+2) Monthly Balance", image: "Set A.jpg", teaRecommend: "HER TEA", price: "1,790.-", perDay: "64",
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ ประเมินแล้วอยู่ในกลุ่มใช้ยาคุม/หยุดยา"
                     },
                     STANDARD_PMS: {
-                        title: "ให้ทุกวันคือวันที่สดใสสำหรับคุณ ✨",
-                        description: "บอกลางอแง สิวบุก และอารมณ์เหวี่ยงวีน... ให้ Seed Cycling ช่วย **ประคองฮอร์โมนให้นิ่งสงบ** และผิวสวยจากภายในนะคะ",
-                        instruction: "เริ่ม **Phase 1** วันแรกที่ประจำเดือนมา 14 วัน และสลับ **Phase 2** ทันทีอีก 14 วัน จนครบรอบ 28 วันค่ะ",
-                        whyDuration: "การทานต่อเนื่อง **3 เดือน** จะช่วยให้ร่างกายจดจำสมดุลใหม่ได้แม่นยำขึ้น จนคุณสังเกตเห็น <u>ความเปลี่ยนแปลงในรอบถัดไป</u> ค่ะ",
-                        package: "Set A (1+1) Monthly Balance", price: "1,790.-", perDay: "64.-",
-                        copyMsg: "สนใจ Set A (1+1) ค่ะ ประเมินแล้วอยากลดอาการ PMS/สิว"
+                        title: "ให้ทุกเดือนเป็นวันที่สดใส ✨",
+                        description: "บอกลางอแง สิวบุก และอารมณ์เหวี่ยง... ให้ธรรมชาติช่วยประคองฮอร์โมนให้นิ่งสงบนะคะ",
+                        instruction: "ทานสลับ Phase 1&2 ตามรอบเดือนปกติ ทานต่อเนื่อง 3 เดือนเพื่อผลลัพธ์ที่ยั่งยืนค่ะ",
+                        package: "Set A (1+2) Monthly Balance", image: "Set A.jpg", teaRecommend: "HER TEA", price: "1,790.-", perDay: "64",
+                        copyMsg: "สนใจ Set A (1+2) ค่ะ อยากลดอาการ PMS ทั่วไป"
                     }
                 };
 
                 const res = results[resultKey] || results['STANDARD_PMS'];
 
-                const formatText = (text) => {
-                    if (!text) return "";
-                    const parts = text.split(/(\*\*.*?\*\*|<u>.*?<\/u>)/);
-                    return parts.map((part, i) => {
-                        if (part.startsWith('**') && part.endsWith('**')) {
-                            return <strong key={i} className="font-bold text-[#A51D24]">{part.slice(2, -2)}</strong>;
-                        }
-                        if (part.startsWith('<u>') && part.endsWith('</u>')) {
-                            return <u key={i} className="underline decoration-red-200 underline-offset-4">{part.slice(3, -4)}</u>;
-                        }
-                        return part;
-                    });
-                };
-
                 return (
                     <div className="space-y-8 animate-in">
-                        <div className={`p-7 rounded-[2.5rem] ${res.bg || 'bg-[#FDFBF7]'} border border-red-100 shadow-sm relative`}>
-                            <div className="flex justify-between items-start mb-6">
-                                <h2 className={`text-2xl font-bold ${res.color || 'text-[#A51D24]'} leading-tight`}>{res.title}</h2>
-                                {!res.hideCTA && <i data-lucide="sparkles" className="w-6 h-6 text-[#A51D24]"></i>}
-                            </div>
-                            <p className="text-gray-600 mb-8 leading-relaxed font-light italic text-sm">{formatText(res.description)}</p>
-                            
+                        <div className={`p-7 rounded-[2.5rem] ${res.bg || 'bg-[#FDFBF7]'} border border-red-100 shadow-sm relative overflow-hidden`}>
+                            <h2 className={`text-2xl font-bold ${res.color || 'text-[#A51D24]'} mb-6`}>{res.title}</h2>
+                            <p className="text-gray-600 mb-8 leading-relaxed font-light italic text-sm">
+                                {res.description.replace(/\*\*/g, '')}
+                            </p>
+
                             <div className="space-y-5">
                                 {res.instruction && (
-                                    <div className="bg-white/60 p-5 rounded-3xl border border-red-50">
-                                        <h3 className="font-bold text-[#A51D24] mb-2 flex items-center gap-2 text-xs uppercase tracking-wider"><i data-lucide="calendar" className="w-4 h-4"></i> วิธีการทานที่แนะนำ</h3>
-                                        <p className="text-sm text-gray-700 font-medium leading-relaxed">{formatText(res.instruction)}</p>
-                                        <p className="text-[10px] text-gray-400 mt-2 italic font-light">⏰ ทานเวลาไหนก็ได้ 1 scoop/วัน ผสมเครื่องดื่มหรือโรยอาหารได้เลยค่ะ</p>
+                                    <div className="bg-white/60 p-5 rounded-3xl border border-red-50 text-sm">
+                                        <h3 className="font-bold text-[#A51D24] mb-2 flex items-center gap-2 text-[10px] uppercase tracking-wider">
+                                            <i data-lucide="calendar" className="w-3 h-3"></i> วิธีการทานที่แนะนำ
+                                        </h3>
+                                        {res.instruction.replace(/\*\*/g, '')}
                                     </div>
                                 )}
-                                {res.whyDuration && (
-                                    <div className="bg-pink-50/30 p-5 rounded-3xl border border-pink-100">
-                                        <h3 className="font-bold text-pink-700 mb-2 flex items-center gap-2 text-xs uppercase tracking-wider"><i data-lucide="clock" className="w-4 h-4"></i> ทำไมถึงแนะนำ {res.package.includes('6') ? '6' : '3'} เดือน?</h3>
-                                        <p className="text-sm text-gray-600 italic leading-relaxed">{formatText(res.whyDuration)}</p>
-                                    </div>
-                                )}
-                                {!res.hideCTA && (
-                                    <div className="bg-white/40 p-5 rounded-3xl border border-dashed border-red-100 text-center">
-                                        <h3 className="text-[9px] uppercase tracking-widest text-gray-400 mb-3 font-bold text-center">ผลลัพธ์จริงจากผู้หญิงที่ทำ Seed Cycling</h3>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {commonStats.map((s, idx) => (
-                                                <div key={idx}>
-                                                    <p className="text-xl font-black text-[#A51D24]">{s.value}</p>
-                                                    <p className="text-[9px] text-gray-500 leading-tight">{s.label}</p>
-                                                </div>
-                                            ))}
+                                {!res.hideCTA && !res.isRedFlag && (
+                                    <div className="bg-white rounded-[2rem] p-4 border border-red-50">
+                                        <div className="w-full h-40 bg-gray-50 rounded-2xl mb-3 flex items-center justify-center overflow-hidden">
+                                            <img src={res.image} alt="Product" className="h-full object-contain" />
+                                        </div>
+                                        <h4 className="font-bold text-sm text-gray-800">{res.package}</h4>
+                                        <div className="flex justify-between items-end mt-2">
+                                            <p className="text-xl font-black text-[#A51D24]">{res.price}</p>
+                                            <div className="bg-red-50 px-3 py-1 rounded-full text-[10px] font-bold text-[#A51D24]">เฉลี่ยวันละ {res.perDay}.-</div>
                                         </div>
                                     </div>
                                 )}
                             </div>
-
-                            {!res.hideCTA && (
-                                <div className="mt-8 pt-6 border-t border-dashed border-red-200 flex flex-col sm:flex-row justify-between items-center gap-6">
-                                    <div className="text-center sm:text-left">
-                                        <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">Recommended Cycle</h3>
-                                        <p className="text-lg font-bold text-[#A51D24]">{res.package}</p>
-                                        <p className="text-[11px] text-gray-400 font-medium">ราคาพิเศษ {res.price} / รอบ</p>
-                                    </div>
-                                    <div className={`relative px-8 py-3.5 rounded-full shadow-lg min-w-[150px] ${res.bestValue ? 'bg-[#A51D24] text-white' : 'bg-white border-2 border-[#A51D24] text-[#A51D24]'}`}>
-                                        {res.bestValue && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-[#A51D24] text-[9px] font-black px-4 py-1 rounded-full whitespace-nowrap shadow-sm">Best Value คุ้มที่สุด</span>}
-                                        <div className="flex flex-col items-center leading-none">
-                                            <span className="text-[10px] uppercase tracking-widest mb-1.5 font-bold opacity-80">เฉลี่ยเพียง</span>
-                                            <p className="text-2xl font-black">{res.perDay}<span className="text-sm font-bold">/วัน</span></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {!res.hideCTA && (
-                                <div className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-1">
-                                    {trustBadges.map((b, i) => (
-                                        <span key={i} className="text-[9px] text-gray-400 font-medium flex items-center gap-1"><i data-lucide="check" className="w-2.5 h-2.5 text-[#A51D24]"></i> {b}</span>
-                                    ))}
-                                </div>
-                            )}
                         </div>
 
                         <div className="space-y-4">
-                            {!res.hideCTA ? (
+                            {!res.hideCTA && !res.isRedFlag && (
                                 <>
-                                    <button onClick={() => window.open(`https://meraki.co.th/products/${res.package.includes('B') ? 'set-b' : 'set-a'}`)}
-                                        className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-2xl flex items-center justify-center gap-3 text-lg ring-4 ring-red-100 active:scale-95 transition-transform">สั่งซื้อด้วยตัวเอง 🌟</button>
-                                    <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ผลประเมินคือ: ' + res.copyMsg)}`)}
-                                        className="w-full bg-white border-2 border-red-500 text-[#A51D24] font-bold py-5 rounded-full shadow-lg flex items-center justify-center gap-3 active:scale-95 transition-transform"><i data-lucide="message-circle" className="w-5 h-5"></i> ปรึกษา / รับเซตแนะนำ</button>
-                                    <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ขอรับเซตเริ่มต้น 1 เดือนไปลองทานก่อนค่ะ')}`)}
-                                        className="w-full bg-white border border-gray-200 text-gray-400 font-bold py-4 rounded-full text-xs active:scale-95 transition-transform">เลือก "เซตเริ่มต้น" 1 รอบก่อนค่ะ</button>
+                                    <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('สวัสดีค่ะ ผลประเมินคือ: ' + res.copyMsg)}`)}
+                                        className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-2xl flex items-center justify-center gap-3 text-lg">
+                                        รับเซตแนะนำ (ดูแลพิเศษ) 🌟
+                                    </button>
+                                    <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('ขอรับเซตเริ่มต้น 1 รอบก่อนค่ะ')}`)}
+                                        className="w-full bg-white border-2 border-red-500 text-[#A51D24] font-bold py-5 rounded-full">เลือก "เซตเริ่มต้น" 1 รอบก่อนค่ะ</button>
                                 </>
-                            ) : (
-                                <button onClick={() => window.open(`https://line.me/ti/p/@meraki?text=${encodeURIComponent('สอบถามข้อมูลเพิ่มเติมเรื่องอาการแพ้ค่ะ')}`)}
-                                    className="w-full bg-gray-800 text-white font-bold py-5 rounded-full flex items-center justify-center gap-3 active:scale-95 transition-transform"><i data-lucide="message-circle" className="w-5 h-5"></i> พูดคุยกับผู้เชี่ยวชาญเพิ่มเติม</button>
                             )}
-                            <button onClick={resetQuiz} className="w-full text-gray-300 text-xs font-bold py-4 flex items-center justify-center gap-2 uppercase tracking-widest"><i data-lucide="refresh-cw" className="w-4 h-4"></i> เริ่มประเมินใหม่</button>
+                            {answers.seriousness >= 8 && answers.contactInfo.phone && (
+                                <div className="p-6 bg-green-50 rounded-[2rem] border border-green-100 text-center">
+                                    <p className="text-sm font-bold text-green-800 tracking-tight">แอดมินรับทราบค่ะ!<br/>เราจะโทรกลับที่ {answers.contactInfo.phone}</p>
+                                </div>
+                            )}
+                            <button onClick={resetQuiz} className="w-full text-gray-300 text-[10px] font-bold uppercase tracking-widest py-4"><i data-lucide="refresh-cw" className="w-3 h-3 inline mr-1"></i> เริ่มประเมินใหม่</button>
                         </div>
                     </div>
                 );
@@ -238,99 +196,102 @@
 
             return (
                 <div className="min-h-screen flex flex-col items-center p-6 pb-12">
-                    <div className="w-full max-w-md text-center mt-6 mb-12 animate-in">
+                    <div className="w-full max-w-md text-center mt-6 mb-12">
                         <h1 className="text-4xl font-light text-[#A51D24] tracking-[0.15em] mb-1 uppercase">MERAKI</h1>
-                        <p className="text-red-300 text-[10px] uppercase tracking-[0.3em] font-bold">Seed Cycling</p>
+                        <p className="text-red-300 text-[10px] uppercase tracking-[0.3em] font-bold">Nature is the best medicine</p>
                     </div>
 
                     <div className="w-full max-w-md bg-white rounded-[3.5rem] shadow-2xl p-10 border border-red-50/50">
                         {step === 0 && (
                             <div className="text-center space-y-10 animate-in">
-                                <div className="w-28 h-28 bg-red-50 rounded-full mx-auto flex items-center justify-center relative">
-                                    <i data-lucide="heart" className="w-12 h-12 text-[#A51D24]"></i>
-                                    <i data-lucide="star" className="w-8 h-8 text-yellow-400 fill-yellow-400 absolute top-0 -right-2 animate-pulse"></i>
-                                </div>
-                                <h2 className="text-4xl font-bold text-gray-800 leading-tight">สวัสดีค่ะ<br/><span className="text-[#A51D24]">คนสวย</span></h2>
-                                <p className="text-gray-400 font-light text-sm px-4 leading-relaxed">แอดมินชวนมาทำแบบประเมินสุขภาพฮอร์โมนเบื้องต้น เพื่อหาเซต Seed Cycling ที่เหมาะสมกับร่างกายของคุณที่สุดนะคะ</p>
-                                <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl flex items-center justify-center text-lg active:scale-95 transition-transform">เริ่มต้นดูแลตัวเอง <i data-lucide="chevron-right" className="ml-2"></i></button>
+                                <div className="w-24 h-24 bg-red-50 rounded-full mx-auto flex items-center justify-center"><i data-lucide="heart" className="w-12 h-12 text-[#A51D24]"></i></div>
+                                <h2 className="text-4xl font-bold text-gray-800 leading-tight">สวัสดีค่ะ<br/><span className="text-[#A51D24]">คนเก่ง</span></h2>
+                                <p className="text-gray-500 font-medium">แอดมินชวนมาทำแบบประเมินสุขภาพฮอร์โมน เพื่อเลือกสิ่งที่ดีที่สุดให้ร่างกายกันค่ะ</p>
+                                <button onClick={nextStep} className="w-full bg-[#A51D24] text-white font-bold py-6 rounded-full shadow-xl flex items-center justify-center text-lg">เริ่มต้นดูแลตัวเอง <i data-lucide="chevron-right" className="ml-2"></i></button>
                             </div>
                         )}
 
-                        {step > 0 && step < 6 && (
+                        {step > 0 && step < 8 && (
                             <div className="animate-in space-y-8">
                                 <div className="flex justify-between items-center">
-                                    <div className="flex gap-2">{[1, 2, 3, 4, 5].map(s => <div key={s} className={`h-1.5 w-7 rounded-full transition-all duration-500 ${step >= s ? 'bg-[#A51D24]' : 'bg-red-50'}`}></div>)}</div>
-                                    <span className="text-[10px] font-bold text-red-200">STEP {step}/5</span>
+                                    <div className="flex gap-1.5">{[1, 2, 3, 4, 5, 6].map(s => <div key={s} className={`h-1.5 w-6 rounded-full ${step >= s ? 'bg-[#A51D24]' : 'bg-red-50'}`}></div>)}</div>
+                                    <span className="text-[10px] font-bold text-red-200">STEP {step}/7</span>
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-800 leading-tight">
-                                    {step === 1 && "เป้าหมายที่คุณกังวล?"}
-                                    {step === 2 && "รอบเดือนของคุณเป็นอย่างไร?"}
-                                    {step === 3 && "มีประวัติสุขภาพเหล่านี้ไหม?"}
-                                    {step === 4 && "ประวัติการแพ้ & ความปลอดภัย"}
-                                    {step === 5 && "ปัจจุบันใช้ยาคุมไหม?"}
-                                </h2>
-                                <div className="grid gap-3">
-                                    {step === 1 && ['pms', 'pcos', 'pregnancy', 'menopause', 'general'].map(id => (
-                                        <button key={id} onClick={() => handleSelect('goal', id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] hover:bg-white text-sm font-medium transition-all active:scale-95">
-                                            {id === 'pms' && 'ปวดท้องเมนส์ / สิวฮอร์โมน / อารมณ์แปรปรวน'}
-                                            {id === 'pcos' && 'PCOS / ประจำเดือนมาไม่ปกติ'}
-                                            {id === 'pregnancy' && 'เตรียมพร้อมมีเบบี๋ / บำรุงไข่'}
-                                            {id === 'menopause' && 'วัยทอง / ร้อนวูบวาบ / นอนไม่หลับ'}
-                                            {id === 'general' && 'ดูแลสุขภาพและปรับสมดุลทั่วไป'}
-                                        </button>
-                                    ))}
-                                    {step === 2 && ['regular', 'irregular', 'none'].map(id => (
-                                        <button key={id} onClick={() => handleSelect('regularity', id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm font-medium transition-all active:scale-95">
-                                            {id === 'regular' ? 'มาสม่ำเสมอ จับรอบวันได้ปกติ' : id === 'irregular' ? 'มาไม่ปกติ ขาดหาย จับจังหวะไม่ได้' : 'เข้าสู่วัยหมดประจำเดือน'}
-                                        </button>
-                                    ))}
-                                    {step === 3 && ['endo', 'cysts', 'fibroids', 'cancer', 'warfarin', 'none'].map(id => (
-                                        <button key={id} onClick={() => id === 'none' ? (setAnswers({...answers, medical: []}), nextStep()) : toggleSelection('medical', id)}
-                                            className={`text-left p-5 rounded-3xl border transition-all flex justify-between items-center text-sm font-medium active:scale-95 ${answers.medical.includes(id) ? 'border-[#A51D24] bg-red-50 text-[#A51D24]' : 'border-red-50'}`}>
-                                            {id === 'endo' && 'เยื่อบุมดลูกเจริญผิดที่'}
-                                            {id === 'cysts' && 'ช็อกโกแลตซีสต์'}
-                                            {id === 'fibroids' && 'เนื้องอกในมดลูก'}
-                                            {id === 'cancer' && 'มะเร็งที่ไวต่อฮอร์โมน'}
-                                            {id === 'warfarin' && 'ทานยาละลายลิ่มเลือด'}
-                                            {id === 'none' && 'ไม่มีภาวะข้างต้น'}
-                                            {answers.medical.includes(id) && <i data-lucide="check-circle-2" className="w-5 h-5 text-[#A51D24]"></i>}
-                                        </button>
-                                    ))}
-                                    {step === 4 && (
-                                        <div className="space-y-6">
-                                            <div className="grid gap-2">
-                                                {['flax', 'pumpkin', 'sesame', 'sunflower', 'other_nuts', 'none'].map(id => (
-                                                    <button key={id} onClick={() => id === 'none' ? setAnswers({...answers, allergies: ['none']}) : toggleSelection('allergies', id)}
-                                                        className={`text-left p-4 rounded-2xl border text-xs font-medium transition-all active:scale-95 ${answers.allergies.includes(id) ? 'border-[#A51D24] bg-red-50 text-[#A51D24]' : 'border-red-50'}`}>
-                                                        {id === 'none' ? 'ไม่มีประวัติแพ้ค่ะ' : `แพ้เมล็ด${id === 'flax' ? 'แฟลกซ์' : id === 'pumpkin' ? 'ฟักทอง' : id === 'sesame' ? 'งา' : id === 'sunflower' ? 'ทานตะวัน' : 'อื่นๆ'}`}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            <div className="p-6 bg-[#FDFBF7] rounded-[2.5rem] border border-red-50 text-center">
-                                                <p className="text-[10px] font-bold text-gray-500 mb-4 uppercase tracking-widest">ตั้งครรภ์ / ให้นมบุตร?</p>
-                                                <div className="flex gap-2">
-                                                    <button onClick={()=>setAnswers({...answers, pregnancy:'yes'})} className={`flex-1 py-4 rounded-full border font-bold transition-all ${answers.pregnancy==='yes'?'bg-[#A51D24] text-white':'bg-white text-gray-400'}`}>ใช่ค่ะ</button>
-                                                    <button onClick={()=>setAnswers({...answers, pregnancy:'no'})} className={`flex-1 py-4 rounded-full border font-bold transition-all ${answers.pregnancy==='no'?'bg-[#A51D24] text-white':'bg-white text-gray-400'}`}>ไม่ใช่ค่ะ</button>
-                                                </div>
+                                
+                                {step === 1 && (
+                                    <div className="grid gap-3">
+                                        <h2 className="text-2xl font-bold text-gray-800 leading-tight mb-4">ปัญหาที่คุณกังวล?</h2>
+                                        {['pms', 'pcos', 'weight_loss', 'pregnancy', 'menopause', 'general'].map(id => (
+                                            <button key={id} onClick={() => handleSelect('goal', id)} className="text-left p-5 rounded-2xl border border-red-50 bg-[#FDFBF7] text-sm font-medium">
+                                                {id === 'pms' && 'ปวดท้องเมนส์ / สิวฮอร์โมน'}
+                                                {id === 'pcos' && 'PCOS / ประจำเดือนมาไม่ปกติ'}
+                                                {id === 'weight_loss' && 'ลดน้ำหนักยาก / บวมน้ำ'}
+                                                {id === 'pregnancy' && 'เตรียมพร้อมมีเบบี๋ / บำรุงไข่'}
+                                                {id === 'menopause' && 'วัยทอง / ร้อนวูบวาบ'}
+                                                {id === 'general' && 'ดูแลสุขภาพทั่วไป'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {step === 4 && (
+                                    <div className="space-y-6">
+                                        <h2 className="text-2xl font-bold text-gray-800 mb-4">ประวัติการแพ้</h2>
+                                        <div className="grid gap-2">
+                                            {['flax', 'pumpkin', 'sesame', 'sunflower', 'none'].map(id => (
+                                                <button key={id} onClick={() => id === 'none' ? setAnswers({...answers, allergies:['none']}) : toggleSelection('allergies', id)}
+                                                    className={`p-4 rounded-xl border text-left text-xs ${answers.allergies.includes(id) ? 'border-[#A51D24] bg-red-50' : 'border-red-50'}`}>
+                                                    {id === 'none' ? 'ไม่มีประวัติแพ้ค่ะ' : `แพ้เมล็ด${id}`}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <div className="bg-white p-6 rounded-3xl border border-red-50">
+                                            <p className="text-center text-[10px] font-bold uppercase mb-3">ตั้งครรภ์ / ให้นมบุตร?</p>
+                                            <div className="flex gap-2">
+                                                <button onClick={()=>setAnswers({...answers, pregnancy:'yes'})} className={`flex-1 py-3 rounded-full border font-bold ${answers.pregnancy==='yes'?'bg-[#A51D24] text-white':'bg-white text-gray-400'}`}>ใช่</button>
+                                                <button onClick={()=>setAnswers({...answers, pregnancy:'no'})} className={`flex-1 py-3 rounded-full border font-bold ${answers.pregnancy==='no'?'bg-[#A51D24] text-white':'bg-white text-gray-400'}`}>ไม่</button>
                                             </div>
                                         </div>
-                                    )}
-                                    {step === 5 && ['pill', 'stop_soon', 'none'].map(id => (
-                                        <button key={id} onClick={() => handleSelect('birthControl', id)} className="text-left p-6 rounded-3xl border border-red-50 bg-[#FDFBF7] text-sm font-medium transition-all active:scale-95">
-                                            {id === 'pill' ? 'ทานยาคุม / ฉีด / ฝัง / ใส่ห่วง' : id === 'stop_soon' ? 'มีแพลนจะหยุดยาคุมเร็วๆ นี้' : 'ไม่ได้ใช้ยาคุมฮอร์โมนค่ะ'}
-                                        </button>
-                                    ))}
-                                </div>
-                                {(step === 3 || step === 4) && <button onClick={nextStep} disabled={step===4 && (!answers.pregnancy || answers.allergies.length===0)} className="w-full bg-[#A51D24] text-white font-bold py-5 rounded-full shadow-lg transition-all active:scale-95 disabled:opacity-20 uppercase tracking-widest">Confirm</button>}
-                                <button onClick={prevStep} className="w-full text-gray-400 text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2"><i data-lucide="chevron-left" className="w-3 h-3"></i> Back</button>
+                                        <button onClick={nextStep} disabled={!answers.pregnancy} className="w-full bg-[#A51D24] text-white py-4 rounded-full font-bold disabled:opacity-30">ยืนยัน</button>
+                                    </div>
+                                )}
+
+                                {step === 6 && (
+                                    <div className="text-center space-y-12">
+                                        <h2 className="text-2xl font-bold text-gray-800">จริงจังแค่ไหนคะ?</h2>
+                                        <input type="range" min="1" max="10" value={answers.seriousness} onChange={(e)=>setAnswers({...answers, seriousness: parseInt(e.target.value)})}
+                                            className="w-full h-2 bg-red-50 rounded-lg appearance-none cursor-pointer accent-[#A51D24]" />
+                                        <div className="text-6xl font-black text-red-50">{answers.seriousness}</div>
+                                        <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-6 rounded-full font-bold">ถัดไป</button>
+                                    </div>
+                                )}
+
+                                {step === 7 && (
+                                    <div className="space-y-8 text-center">
+                                        <h2 className="text-2xl font-bold text-gray-800">ต้องการให้แอดมิน<br/>โทรให้คำปรึกษาฟรี?</h2>
+                                        <input type="tel" placeholder="กรอกเบอร์โทร" value={answers.contactInfo.phone} 
+                                            onChange={(e)=>setAnswers({...answers, contactInfo:{...answers.contactInfo, phone: e.target.value}})}
+                                            className="w-full p-5 rounded-2xl bg-gray-50 border-none text-center font-bold" />
+                                        <div className="flex gap-2">
+                                            {['อังคาร', 'เสาร์'].map(slot => (
+                                                <button key={slot} onClick={()=>setAnswers({...answers, contactInfo:{...answers.contactInfo, timeSlot:slot}})}
+                                                    className={`flex-1 py-3 rounded-full border text-xs font-bold ${answers.contactInfo.timeSlot===slot?'bg-[#A51D24] text-white':'bg-white'}`}>{slot}</button>
+                                            ))}
+                                        </div>
+                                        <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-6 rounded-full font-bold">ดูผลประเมิน</button>
+                                    </div>
+                                )}
+                                
+                                {step !== 1 && step !== 4 && step !== 6 && step !== 7 && (
+                                    <div className="grid gap-3">
+                                        <button onClick={nextStep} className="w-full bg-[#A51D24] text-white py-6 rounded-full font-bold">ถัดไป</button>
+                                        <button onClick={prevStep} className="text-gray-400 text-[10px] font-bold uppercase tracking-widest py-2">Back</button>
+                                    </div>
+                                )}
                             </div>
                         )}
 
-                        {step === 6 && <ResultDisplay />}
-                    </div>
-                    <div className="mt-12 flex flex-col items-center gap-4 opacity-30">
-                        <i data-lucide="moon" className="w-5 h-5 text-red-400"></i>
-                        <p className="text-[10px] uppercase tracking-[0.5em] font-bold">Nature is the best medicine</p>
+                        {step === 8 && <ResultDisplay />}
                     </div>
                 </div>
             );
